@@ -1,4 +1,4 @@
-package com.example.solariotmobile.ui.temperature
+package com.example.solariotmobile.ui.temperatures
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

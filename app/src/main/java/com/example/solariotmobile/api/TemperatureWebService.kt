@@ -1,6 +1,6 @@
 package com.example.solariotmobile.api
 
-import com.example.solariotmobile.ui.temperature.ReadingDeviceWithLastTemperatureDto
+import com.example.solariotmobile.ui.temperatures.ReadingDeviceWithLastTemperatureDto
 import retrofit2.http.GET
 
 interface TemperatureWebService {

@@ -1,4 +1,4 @@
-package com.example.solariotmobile.ui.temperature
+package com.example.solariotmobile.ui.temperatures
 
 data class ReadingDeviceWithLastTemperatureDto (
     val id: Int,
