@@ -6,6 +6,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface TemperatureWebService {
-    @GET("get-last-temperatures")
+    @GET("last-temperatures")
     fun getLastTemperatures(): Call<List<TemperatureDto>>
 }

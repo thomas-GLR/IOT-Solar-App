@@ -12,13 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,52 +32,36 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.example.solariotmobile.api.ApiResponse
-import com.example.solariotmobile.api.TemperatureWebService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun TemperaturesScreen() {
+fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = viewModel(factory = LastTemperaturesViewModel.Factory)) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     var loading by remember { mutableStateOf(true) }
-    var failed by remember { mutableStateOf(false) }
+    var failure by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
-    var lastTemperatures = mutableListOf<TemperatureDto>()
+    var lastTemperatures by remember { mutableStateOf(emptyList<TemperatureDto>()) }
+
+    viewModel.isLoading.observe(lifecycleOwner) { isLoading ->
+        loading = isLoading
+    }
+    viewModel.isFailure.observe(lifecycleOwner) { isFailure ->
+        failure = isFailure
+    }
+    viewModel.getMessage.observe(lifecycleOwner) { getMessage ->
+        message = getMessage
+    }
+    viewModel.getLastTemperature.observe(lifecycleOwner) { getLastTemperature ->
+        lastTemperatures = getLastTemperature
+    }
 
     val configuration = LocalConfiguration.current
 
-    val retrofit = Retrofit.Builder()
-        .baseUrl("http://147.79.100.54:3000/temperatures/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    val temperaturesWebService: TemperatureWebService =
-        retrofit.create(TemperatureWebService::class.java)
-
-    val callGetLastTemperatures = temperaturesWebService.getLastTemperatures()
-
-    callGetLastTemperatures.enqueue(object : Callback<List<TemperatureDto>> {
-        override fun onResponse(
-            call: Call<List<TemperatureDto>>,
-            response: Response<List<TemperatureDto>>
-        ) {
-            loading = true
-            failed = false
-            lastTemperatures = response.body() as MutableList<TemperatureDto>
-            var apiResponse: ApiResponse<List<TemperatureDto>>
-            apiResponse.failure = true
-        }
-
-        override fun onFailure(call: Call<List<TemperatureDto>>, throwable: Throwable) {
-            failed = true
-            loading = false
-            message = throwable.message ?: ""
-        }
-
-    })
+    LaunchedEffect(Unit) {
+        viewModel.fetchData()
+    }
 
     if (loading) {
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -91,7 +75,7 @@ fun TemperaturesScreen() {
         }
     }
 
-    if (failed) {
+    if (failure) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
@@ -105,7 +89,7 @@ fun TemperaturesScreen() {
             ) {
                 Text("Un problème est survenue : $message")
             }
-            Button(onClick = { }) {
+            Button(onClick = { viewModel.fetchData() }) {
                 Text("Recharger la page")
             }
         }
@@ -120,10 +104,6 @@ fun TemperaturesScreen() {
             }
         }
     }
-}
-
-fun loadLastTemperatures() {
-
 }
 
 @Composable
