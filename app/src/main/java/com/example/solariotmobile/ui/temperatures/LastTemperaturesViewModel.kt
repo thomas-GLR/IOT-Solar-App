@@ -8,17 +8,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.solariotmobile.api.TemperatureWebService
-import com.example.solariotmobile.utils.LocalDateTimeAdapter
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializer
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.text.DateFormat
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 
 class LastTemperaturesViewModel: ViewModel() {
     private val _loading =  MutableLiveData(true)
@@ -36,8 +35,11 @@ class LastTemperaturesViewModel: ViewModel() {
         _message.value = ""
         _lastTemperatures.value = mutableListOf()
         viewModelScope.launch {
+            val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
+                LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            }
             val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTimeAdapter::class.java, LocalDateTimeAdapter())
+                .registerTypeAdapter(LocalDateTime::class.java, localDateTimeDeserializer)
                 .create()
 
             val retrofit = Retrofit.Builder()
