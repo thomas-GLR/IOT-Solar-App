@@ -34,6 +34,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = viewModel(factory = LastTemperaturesViewModel.Factory)) {
@@ -125,7 +127,8 @@ fun LandscapeDisplay(
                 // Creating a Canvas to draw a Circle
                 TemperatureDisplay(
                     temperature = temperature.temperature,
-                    temperature.readingDeviceName.name
+                    readingDeviceName = temperature.readingDeviceName.name,
+                    collectionDate = temperature.collectionDate
                 )
 
                 Spacer(modifier = Modifier.width(200.dp))
@@ -152,7 +155,8 @@ fun PortraitDisplay(
             lastTemperatures.forEach { temperature ->
                 TemperatureDisplay(
                     temperature = temperature.temperature,
-                    temperature.readingDeviceName.name
+                    readingDeviceName = temperature.readingDeviceName.name,
+                    collectionDate = temperature.collectionDate
                 )
                 Spacer(modifier = Modifier.height(150.dp))
             }
@@ -163,7 +167,8 @@ fun PortraitDisplay(
 @Composable
 fun TemperatureDisplay(
     temperature: Double,
-    readingDeviceName: String
+    readingDeviceName: String,
+    collectionDate: LocalDateTime
 ) {
     Column(
         Modifier
@@ -191,5 +196,6 @@ fun TemperatureDisplay(
                 }
         )
         Text(text = readingDeviceName)
+        Text(text = collectionDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm")))
     }
 }

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Solar IOT mobile</string>
+    <string name="server_address">server_address</string>
+    <string name="server_port">server_port</string>
 </resources>

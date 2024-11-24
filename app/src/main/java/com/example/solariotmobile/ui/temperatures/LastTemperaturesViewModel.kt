@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.solariotmobile.api.RetrofitInstance
 import com.example.solariotmobile.api.TemperatureWebService
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
@@ -35,22 +36,22 @@ class LastTemperaturesViewModel: ViewModel() {
         _message.value = ""
         _lastTemperatures.value = mutableListOf()
         viewModelScope.launch {
-            val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
-                LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-            }
-            val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, localDateTimeDeserializer)
-                .create()
+//            val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
+//                LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+//            }
+//            val gson = GsonBuilder()
+//                .registerTypeAdapter(LocalDateTime::class.java, localDateTimeDeserializer)
+//                .create()
+//
+//            val retrofit = Retrofit.Builder()
+//                .baseUrl("http://192.168.1.105:3000/temperatures/")
+//                .addConverterFactory(GsonConverterFactory.create(gson))
+//                .build()
+//
+//            val temperaturesWebService: TemperatureWebService =
+//                retrofit.create(TemperatureWebService::class.java)
 
-            val retrofit = Retrofit.Builder()
-                .baseUrl("http://192.168.173.93:3000/temperatures/")
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
-
-            val temperaturesWebService: TemperatureWebService =
-                retrofit.create(TemperatureWebService::class.java)
-
-            val callGetLastTemperatures = temperaturesWebService.getLastTemperatures()
+            val callGetLastTemperatures = RetrofitInstance.temperatureWebService.getLastTemperatures()
 
             callGetLastTemperatures.enqueue(object : Callback<List<TemperatureDto>> {
                 override fun onResponse(
