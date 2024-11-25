@@ -1,7 +1,5 @@
 package com.example.solariotmobile.ui.settings
 
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -30,10 +28,6 @@ class SettingRepository(private val dataStore: DataStore<Preferences>) {
             port = preferences[SERVER_PORT] ?: ""
             preferences[SERVER_PORT] ?: ""
         }
-
-    fun getUrl(): String {
-        return String.format("http://%s:%s", host, port)
-    }
 
     suspend fun saveServerAddress(serverAddress: String) {
         dataStore.edit { preferences ->

@@ -41,7 +41,7 @@ import java.time.format.DateTimeFormatter
 fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = viewModel(factory = LastTemperaturesViewModel.Factory)) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    var loading by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
     var lastTemperatures by remember { mutableStateOf(emptyList<TemperatureDto>()) }
@@ -185,7 +185,6 @@ fun TemperatureDisplay(
                     val canvasWidth = size.width
                     val canvasHeight = size.height
                     onDrawBehind {
-
                         drawCircle(
                             brush = brush,
                             // center = Offset(x = canvasWidth / 2, y = canvasHeight / 2),

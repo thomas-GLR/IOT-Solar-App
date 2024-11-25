@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.solariotmobile.api.TemperatureWebService
 import retrofit2.Call
@@ -33,6 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory)
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val serverAddress by viewModel.serverAddressState.collectAsState()
     val serverPort by viewModel.serverPortState.collectAsState()
@@ -42,6 +47,16 @@ fun SettingsScreen(
     var message by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var port by remember { mutableStateOf("") }
+
+    viewModel.isLoading.observe(lifecycleOwner) { isLoading ->
+        loading = isLoading
+    }
+    viewModel.isFailure.observe(lifecycleOwner) { isFailure ->
+        failure = isFailure
+    }
+    viewModel.getMessage.observe(lifecycleOwner) { getMessage ->
+        message = getMessage
+    }
 
     // When the screen is initialized the first time, textfield are blank.
     // LaunchedEffect fill them when the 2 arguments changes
@@ -73,39 +88,20 @@ fun SettingsScreen(
             Text("Enregistrer")
         }
         Button(onClick = {
-            message = ""
-            loading = true
-            failure = false
-
-            val retrofit = Retrofit.Builder()
-                .baseUrl("http://192.168.1.105:3000")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-
-            val temperaturesWebService: TemperatureWebService =
-                retrofit.create(TemperatureWebService::class.java)
-
-            val callGetLastTemperatures = temperaturesWebService.getHelloWorld()
-
-            callGetLastTemperatures.enqueue(object : Callback<String> {
-                override fun onResponse(
-                    call: Call<String>,
-                    response: Response<String>
-                ) {
-                    loading = false
-                    failure = false
-                    message = "Connexion réussie !"
-                }
-
-                override fun onFailure(call: Call<String>, throwable: Throwable) {
-                    failure = true
-                    loading = false
-                    message = throwable.message ?: "Aucun message d'erreur"
-                }
-
-            })
+            viewModel.fetchData(address, port)
         }) {
             Text("Tester la connexion")
+        }
+        if (loading) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .width(64.dp)
+                        .align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
         }
         if (message.isNotEmpty()) {
             val backgroundColor: Color = if (failure) {

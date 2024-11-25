@@ -7,21 +7,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.solariotmobile.api.RetrofitInstance
+import com.example.solariotmobile.IOTSolarApplication
+import com.example.solariotmobile.api.RetrofitProvider
 import com.example.solariotmobile.api.TemperatureWebService
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-class LastTemperaturesViewModel: ViewModel() {
-    private val _loading =  MutableLiveData(true)
+class LastTemperaturesViewModel(private val retrofitProvider: RetrofitProvider) : ViewModel() {
+    private val _loading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> get() = _loading
     private val _failure = MutableLiveData(false)
     val isFailure: LiveData<Boolean> get() = _failure
@@ -36,48 +31,52 @@ class LastTemperaturesViewModel: ViewModel() {
         _message.value = ""
         _lastTemperatures.value = mutableListOf()
         viewModelScope.launch {
-//            val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
-//                LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-//            }
-//            val gson = GsonBuilder()
-//                .registerTypeAdapter(LocalDateTime::class.java, localDateTimeDeserializer)
-//                .create()
-//
-//            val retrofit = Retrofit.Builder()
-//                .baseUrl("http://192.168.1.105:3000/temperatures/")
-//                .addConverterFactory(GsonConverterFactory.create(gson))
-//                .build()
-//
-//            val temperaturesWebService: TemperatureWebService =
-//                retrofit.create(TemperatureWebService::class.java)
+            try {
 
-            val callGetLastTemperatures = RetrofitInstance.temperatureWebService.getLastTemperatures()
+                val retrofit = retrofitProvider.getRetrofit()
+                val temperaturesWebService: TemperatureWebService =
+                    retrofit.create(TemperatureWebService::class.java)
 
-            callGetLastTemperatures.enqueue(object : Callback<List<TemperatureDto>> {
-                override fun onResponse(
-                    call: Call<List<TemperatureDto>>,
-                    response: Response<List<TemperatureDto>>
-                ) {
-                    _loading.value = false
-                    _failure.value = false
-                    _lastTemperatures.value = response.body() as List<TemperatureDto>
-                }
+                val callGetLastTemperatures = temperaturesWebService.getLastTemperatures()
 
-                override fun onFailure(call: Call<List<TemperatureDto>>, throwable: Throwable) {
-                    _failure.value = true
-                    _loading.value = false
-                    _message.value = throwable.message ?: "Aucun message d'erreur"
-                }
+                callGetLastTemperatures.enqueue(object : Callback<List<TemperatureDto>> {
+                    override fun onResponse(
+                        call: Call<List<TemperatureDto>>,
+                        response: Response<List<TemperatureDto>>
+                    ) {
+                        if (response.isSuccessful) {
+                            _loading.value = false
+                            _failure.value = false
+                            _lastTemperatures.value = response.body() as List<TemperatureDto>
+                        } else {
+                            _failure.value = true
+                            _loading.value = false
+                            _message.value = response.message() ?: "Erreur inconnue"
+                        }
+                    }
 
-            })
-        }
-    }
+                    override fun onFailure(call: Call<List<TemperatureDto>>, throwable: Throwable) {
+                        _failure.value = true
+                        _loading.value = false
+                        _message.value = throwable.message ?: "Erreur inconnue"
+                    }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                LastTemperaturesViewModel()
+                })
+            } catch (exception: Exception) {
+                _failure.value = true
+                _loading.value = false
+                _message.value = exception.message ?: "Erreur inconnue"
             }
+    }
+}
+
+companion object {
+    val Factory: ViewModelProvider.Factory = viewModelFactory {
+        initializer {
+            val application =
+                this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as IOTSolarApplication
+            LastTemperaturesViewModel(application.retrofitProvider)
         }
     }
+}
 }
