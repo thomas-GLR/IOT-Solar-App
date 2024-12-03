@@ -16,6 +16,10 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class TemperaturesViewModel(private val retrofitProvider: RetrofitProvider): ViewModel() {
     private val _loading =  MutableLiveData(true)
@@ -77,13 +81,17 @@ class TemperaturesViewModel(private val retrofitProvider: RetrofitProvider): Vie
         }
     }
 
-    fun filterTemperatures(selectedReadingDeviceNames: List<ReadingDeviceName>, ) {
+    fun filterTemperatures(selectedReadingDeviceNames: List<ReadingDeviceName>, selectedDateRange: Pair<Long?, Long?>) {
+        val startDate = if (selectedDateRange.first != null) LocalDateTime.ofInstant(Instant.ofEpochMilli(selectedDateRange.first!!), ZoneOffset.UTC).toLocalDate().minusDays(1) else null
+        val endDate = if (selectedDateRange.second != null) LocalDateTime.ofInstant(Instant.ofEpochMilli(selectedDateRange.second!!), ZoneOffset.UTC).toLocalDate().plusDays(1) else null
+        val datesAreNull = startDate == null || endDate == null
 
-    }
-
-    fun filterTemperaturesByReadingName(readingDeviceName: ReadingDeviceName) {
         _temperaturesFiltered.value = _temperatures.value?.filter { temperature ->
-            temperature.readingDeviceName == readingDeviceName
+            val collectionDate = temperature.collectionDate.toLocalDate()
+            (selectedReadingDeviceNames.isEmpty() || selectedReadingDeviceNames.contains(temperature.readingDeviceName))
+                    && (datesAreNull ||
+                    (collectionDate.isAfter(startDate!!)
+                            && collectionDate.isBefore(endDate!!)))
         }
     }
 
