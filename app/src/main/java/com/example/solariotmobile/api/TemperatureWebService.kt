@@ -10,6 +10,9 @@ interface TemperatureWebService {
     @GET("temperatures/last-temperatures")
     fun getLastTemperatures(): Call<List<TemperatureDto>>
 
+    @GET("temperatures")
+    fun getTemperatures():  Call<List<TemperatureDto>>
+
     @GET("/")
     fun getHelloWorld(): Call<String>
 }

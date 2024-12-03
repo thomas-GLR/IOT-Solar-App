@@ -67,16 +67,16 @@ class LastTemperaturesViewModel(private val retrofitProvider: RetrofitProvider) 
                 _loading.value = false
                 _message.value = exception.message ?: "Erreur inconnue"
             }
-    }
-}
-
-companion object {
-    val Factory: ViewModelProvider.Factory = viewModelFactory {
-        initializer {
-            val application =
-                this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as IOTSolarApplication
-            LastTemperaturesViewModel(application.retrofitProvider)
         }
     }
-}
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application =
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as IOTSolarApplication
+                LastTemperaturesViewModel(application.retrofitProvider)
+            }
+        }
+    }
 }
