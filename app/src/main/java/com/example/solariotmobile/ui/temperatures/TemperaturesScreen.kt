@@ -1,6 +1,7 @@
 package com.example.solariotmobile.ui.temperatures
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -96,14 +98,34 @@ fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = viewModel(factory 
             }
         }
     } else {
-        when (configuration.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> {
-                LandscapeDisplay(lastTemperatures = lastTemperatures)
-            }
+        if (lastTemperatures.isNotEmpty()) {
+            var dates: Set<LocalDate> = lastTemperatures
+                .map { lastTemperature -> lastTemperature.collectionDate.toLocalDate() }
+                .toSet()
 
-            else -> {
-                PortraitDisplay(lastTemperatures = lastTemperatures)
+            Column(
+                Modifier
+                    .fillMaxWidth(),
+                Arrangement.Center,
+                Alignment.CenterHorizontally
+            ) {
+                Box(Modifier.height(100.dp)) {
+                    displayDates(dates)
+                }
+
+                // Text("Date de réception : ${collectionDate.format(DateTimeFormatter.ofPattern("dd / MM / yyyy"))}")
+                when (configuration.orientation) {
+                    Configuration.ORIENTATION_LANDSCAPE -> {
+                        LandscapeDisplay(lastTemperatures = lastTemperatures)
+                    }
+
+                    else -> {
+                        PortraitDisplay(lastTemperatures = lastTemperatures)
+                    }
+                }
             }
+        } else {
+            Text("Aucune températures à afficher")
         }
     }
 }
@@ -127,7 +149,7 @@ fun LandscapeDisplay(
                 // Creating a Canvas to draw a Circle
                 TemperatureDisplay(
                     temperature = temperature.temperature,
-                    readingDeviceName = temperature.readingDeviceName.name,
+                    readingDevice = temperature.readingDeviceName,
                     collectionDate = temperature.collectionDate
                 )
 
@@ -155,7 +177,7 @@ fun PortraitDisplay(
             lastTemperatures.forEach { temperature ->
                 TemperatureDisplay(
                     temperature = temperature.temperature,
-                    readingDeviceName = temperature.readingDeviceName.name,
+                    readingDevice = temperature.readingDeviceName,
                     collectionDate = temperature.collectionDate
                 )
                 Spacer(modifier = Modifier.height(150.dp))
@@ -165,11 +187,40 @@ fun PortraitDisplay(
 }
 
 @Composable
+fun displayDates(dates: Set<LocalDate>) {
+    when(dates.size) {
+        0 -> Text("Aucune date récupérée")
+        1 -> Text("Températures prélevées le : " + dates.first().format(DateTimeFormatter.ofPattern("dd / MM / yyyy")))
+        else -> {
+            var datesToDisplay: String = ""
+            dates.forEach{ date ->
+                if (datesToDisplay.isNotEmpty()) {
+                    datesToDisplay += ", "
+                }
+                datesToDisplay += date.format(DateTimeFormatter.ofPattern("dd / MM / yyyy"))
+            }
+            Text("Les données ne possèdent pas les mêmes dates : ")
+        }
+    }
+}
+
+@Composable
 fun TemperatureDisplay(
     temperature: Double,
-    readingDeviceName: String,
+    readingDevice: ReadingDeviceName,
     collectionDate: LocalDateTime
 ) {
+
+    val readingDeviceName = when (readingDevice) {
+        ReadingDeviceName.TOP -> "Haut"
+        ReadingDeviceName.MIDDLE -> "Milieu"
+        ReadingDeviceName.BOTTOM -> "Bas"
+    }
+
+    val text: String = "$temperature°C\n" +
+            "$readingDeviceName\n" +
+            collectionDate.format(DateTimeFormatter.ofPattern("HH:mm"))
+
     Column(
         Modifier
             .fillMaxWidth(),
@@ -177,7 +228,7 @@ fun TemperatureDisplay(
         Alignment.CenterHorizontally
     ) {
         Text(
-            text = "$temperature°C",
+            text = text,
             modifier = Modifier
                 .drawWithCache {
                     val brush =
@@ -189,12 +240,10 @@ fun TemperatureDisplay(
                             brush = brush,
                             // center = Offset(x = canvasWidth / 2, y = canvasHeight / 2),
                             radius = 400F / 2,
-                            style = Stroke(80F)
+                            style = Stroke(40F)
                         )
                     }
                 }
         )
-        Text(text = readingDeviceName)
-        Text(text = collectionDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm")))
     }
 }
