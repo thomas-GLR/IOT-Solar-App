@@ -35,6 +35,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.solariotmobile.ui.components.FailureWithRefresh
+import com.example.solariotmobile.ui.components.Loading
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -68,35 +70,11 @@ fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = viewModel(factory 
     }
 
     if (loading) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .width(64.dp)
-                    .align(Alignment.Center),
-                color = MaterialTheme.colorScheme.secondary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-        }
+        Loading()
     }
 
     if (failure) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .background(Color.Red)
-                    .padding(16.dp)
-            ) {
-                Text("Un problème est survenue : $message")
-            }
-            Button(onClick = { viewModel.fetchData() }) {
-                Text("Recharger la page")
-            }
-        }
+        FailureWithRefresh(message) { viewModel.fetchData() }
     } else {
         if (lastTemperatures.isNotEmpty()) {
             var dates: Set<LocalDate> = lastTemperatures
