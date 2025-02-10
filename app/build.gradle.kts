@@ -50,6 +50,9 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    implementation(libs.inject.jakarta.inject.api)
     implementation(libs.converter.scalars)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.core.ktx)
