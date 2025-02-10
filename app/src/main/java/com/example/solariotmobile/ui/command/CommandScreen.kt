@@ -6,14 +6,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun CommandScreen() {
+fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchLastResistanceState();
+    }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         ToggleSwitch()
     }
@@ -22,6 +29,8 @@ fun CommandScreen() {
 @Composable
 fun ToggleSwitch() {
     var isChecked by remember { mutableStateOf(false) }
+
+
 
     Switch(
         checked = isChecked,

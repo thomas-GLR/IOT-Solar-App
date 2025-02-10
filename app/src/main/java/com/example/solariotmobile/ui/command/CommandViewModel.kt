@@ -1,16 +1,16 @@
 package com.example.solariotmobile.ui.command
 
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CommandViewModel(private val repository: CommandRepository) : ViewModel() {
+@HiltViewModel
+class CommandViewModel @Inject constructor(private val repository: CommandRepository) : ViewModel() {
     private val _loading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _loading.asStateFlow()
     private val _failure = MutableStateFlow(false)
