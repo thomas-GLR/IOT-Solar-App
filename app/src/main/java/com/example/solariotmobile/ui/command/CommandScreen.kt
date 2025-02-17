@@ -30,8 +30,6 @@ fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
 fun ToggleSwitch() {
     var isChecked by remember { mutableStateOf(false) }
 
-
-
     Switch(
         checked = isChecked,
         onCheckedChange = { isChecked = it },

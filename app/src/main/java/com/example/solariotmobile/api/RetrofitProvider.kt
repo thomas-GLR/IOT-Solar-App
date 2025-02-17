@@ -10,6 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@Deprecated("Now using Hilt")
 class RetrofitProvider(private val settingRepository: SettingRepository) {
     private var retrofit: Retrofit? = null
 

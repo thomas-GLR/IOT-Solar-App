@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.solariotmobile.IOTSolarApplication
 import com.example.solariotmobile.api.RetrofitProvider
 import com.example.solariotmobile.api.TemperatureWebService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -21,8 +22,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import javax.inject.Inject
 
-class SettingsViewModel(
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
     private val settingRepository: SettingRepository
 ) : ViewModel() {
     private val _loading = MutableLiveData(false)
@@ -112,12 +115,12 @@ class SettingsViewModel(
         }
     }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as IOTSolarApplication)
-                SettingsViewModel(application.settingRepository)
-            }
-        }
-    }
+//    companion object {
+//        val Factory: ViewModelProvider.Factory = viewModelFactory {
+//            initializer {
+//                val application = (this[APPLICATION_KEY] as IOTSolarApplication)
+//                SettingsViewModel(application.settingRepository)
+//            }
+//        }
+//    }
 }

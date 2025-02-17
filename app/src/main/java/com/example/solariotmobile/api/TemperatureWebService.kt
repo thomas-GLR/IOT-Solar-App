@@ -10,13 +10,13 @@ import retrofit2.http.POST
 
 interface TemperatureWebService {
     @GET("temperatures/last-temperatures")
-    fun getLastTemperatures(): Call<List<TemperatureDto>>
+    suspend fun getLastTemperatures(): Response<List<TemperatureDto>>
 
     @GET("/")
     fun getHelloWorld(): Call<String>
 
     @GET("resistance")
-    fun getLastResistanceState(): Response<ResistanceStateDto>
+    suspend fun getLastResistanceState(): Response<ResistanceStateDto>
 
     @GET("resistance")
     fun getResistancesStates(): Call<List<ResistanceStateDto>>

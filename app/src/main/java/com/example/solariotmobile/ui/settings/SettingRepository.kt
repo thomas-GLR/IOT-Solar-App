@@ -6,8 +6,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class SettingRepository(private val dataStore: DataStore<Preferences>) {
+class SettingRepository @Inject constructor(private val dataStore: DataStore<Preferences>) {
 
     private var host: String = ""
     private var port: String = ""
