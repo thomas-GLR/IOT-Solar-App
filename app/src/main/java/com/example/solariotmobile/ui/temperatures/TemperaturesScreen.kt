@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.solariotmobile.ui.components.FailureComponent
+import com.example.solariotmobile.ui.components.LoadingComponent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -69,36 +71,16 @@ fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = hiltViewModel()) {
     }
 
     if (loading) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .width(64.dp)
-                    .align(Alignment.Center),
-                color = MaterialTheme.colorScheme.secondary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-        }
+        LoadingComponent()
     }
 
     if (failure) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .background(Color.Red)
-                    .padding(16.dp)
-            ) {
-                Text("Un problème est survenue : $message")
-            }
-            Button(onClick = { viewModel.fetchData() }) {
-                Text("Recharger la page")
-            }
-        }
-    } else {
+        FailureComponent(
+            message = message,
+            onButtonClick = { viewModel.fetchData() })
+    }
+
+    if (!failure && !loading) {
         if (lastTemperatures.isNotEmpty()) {
             var dates: Set<LocalDate> = lastTemperatures
                 .map { lastTemperature -> lastTemperature.collectionDate.toLocalDate() }
