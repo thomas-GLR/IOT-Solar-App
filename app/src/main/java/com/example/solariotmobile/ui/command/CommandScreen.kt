@@ -10,9 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -22,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Text
 import com.example.solariotmobile.ui.components.FailureComponent
 import com.example.solariotmobile.ui.components.LoadingComponent
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -50,9 +48,11 @@ fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
         } else {
             Text(
                 "Date de dernière modification en base : ${
-                    lastResistanceState.lastUpdate.format(
-                        DateTimeFormatter.ofPattern("dd / MM / yyyy : hh:mm:ss")
-                    )
+                    lastResistanceState.lastUpdate
+                        .format(
+                            DateTimeFormatter
+                                .ofPattern("dd / MM / yyyy : hh:mm:ss")
+                                .withZone(ZoneOffset.UTC))
                 }",
                 color = Color.Black
             )
@@ -67,7 +67,8 @@ fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
             checked = isResistanceActive,
             onCheckedChange = {
                 viewModel.updateResistanceStateFromUi(it)
-                viewModel.createResistanceState(it) },
+                viewModel.createResistanceState(it)
+            },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                 checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
