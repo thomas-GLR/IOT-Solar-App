@@ -93,7 +93,7 @@ fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = hiltViewModel()) {
                 Alignment.CenterHorizontally
             ) {
                 Box(Modifier.height(100.dp)) {
-                    displayDates(dates)
+                    DisplayDates(dates)
                 }
 
                 // Text("Date de réception : ${collectionDate.format(DateTimeFormatter.ofPattern("dd / MM / yyyy"))}")
@@ -170,7 +170,7 @@ fun PortraitDisplay(
 }
 
 @Composable
-fun displayDates(dates: Set<LocalDate>) {
+fun DisplayDates(dates: Set<LocalDate>) {
     when(dates.size) {
         0 -> Text("Aucune date récupérée")
         1 -> Text("Températures prélevées le : " + dates.first().format(DateTimeFormatter.ofPattern("dd / MM / yyyy")))

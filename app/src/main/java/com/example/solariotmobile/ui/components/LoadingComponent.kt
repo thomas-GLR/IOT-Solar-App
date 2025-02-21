@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 
 @Composable
 fun LoadingComponent() {
@@ -17,7 +18,7 @@ fun LoadingComponent() {
             modifier = Modifier
                 .width(64.dp)
                 .align(Alignment.Center),
-            color = MaterialTheme.colorScheme.secondary,
+            color = FirstGreenForGradient,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
     }

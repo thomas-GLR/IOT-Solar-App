@@ -3,7 +3,6 @@ package com.example.solariotmobile.ui.command
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
@@ -19,7 +18,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Text
 import com.example.solariotmobile.ui.components.FailureComponent
 import com.example.solariotmobile.ui.components.LoadingComponent
-import java.time.ZoneOffset
+import com.example.solariotmobile.ui.theme.ForestGreen
+import com.example.solariotmobile.ui.theme.LightGreen
+import com.example.solariotmobile.ui.theme.MediumSeaGreen
+import com.example.solariotmobile.ui.theme.PaleGreen
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -46,14 +48,11 @@ fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
                 color = Color.Black
             )
         } else {
+            val resistanceStateInformation = if (isResistanceActive) " allumée " else " eteinte "
+            val resistanceStateUpdateDate = lastResistanceState.lastUpdate.format(DateTimeFormatter.ofPattern("dd / MM / yyyy"))
+            val resistanceStateUpdateTime = lastResistanceState.lastUpdate.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
             Text(
-                "Date de dernière modification en base : ${
-                    lastResistanceState.lastUpdate
-                        .format(
-                            DateTimeFormatter
-                                .ofPattern("dd / MM / yyyy : hh:mm:ss")
-                                .withZone(ZoneOffset.UTC))
-                }",
+                "La résistance a été $resistanceStateInformation le $resistanceStateUpdateDate à $resistanceStateUpdateTime",
                 color = Color.Black
             )
         }
@@ -70,10 +69,10 @@ fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
                 viewModel.createResistanceState(it)
             },
             colors = SwitchDefaults.colors(
-                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
-                uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer
+                checkedThumbColor = ForestGreen,
+                checkedTrackColor = LightGreen,
+                uncheckedThumbColor = MediumSeaGreen,
+                uncheckedTrackColor = PaleGreen
             ),
             modifier = Modifier.scale(1.5f)
         )

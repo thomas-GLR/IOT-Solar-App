@@ -13,5 +13,12 @@ val Pink40 = Color(0xFF7D5260)
 
 val FirstGreenForGradient = Color(0xFF32CD32)
 val SecondGreenForGradient = Color(0xFF82CF00)
+val Yellow = Color(0xFF92CF00)
+
+val LightGreen = Color(0xFF90EE90)
+val ForestGreen = Color(0xFF228B22)
+
+val PaleGreen = Color(0xFF98FB98)
+val MediumSeaGreen = Color(0xFF3CB371)
 
 val PrincipalGradient = Brush.horizontalGradient(listOf(FirstGreenForGradient, SecondGreenForGradient))

@@ -37,6 +37,7 @@ class CommandViewModel @Inject constructor(private val repository: CommandReposi
                 if (response.isSuccessful) {
                     if (response.body() != null) {
                         _lastResistanceState.value = response.body()!!
+                        _isResistanceActive.value = _lastResistanceState.value.currentState
                     }
                 } else {
                     _failure.value = true
