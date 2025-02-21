@@ -33,14 +33,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.solariotmobile.ui.components.FailureComponent
+import com.example.solariotmobile.ui.components.LoadingComponent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = viewModel(factory = LastTemperaturesViewModel.Factory)) {
+fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = hiltViewModel()) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     var loading by remember { mutableStateOf(false) }
@@ -68,36 +71,16 @@ fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = viewModel(factory 
     }
 
     if (loading) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .width(64.dp)
-                    .align(Alignment.Center),
-                color = MaterialTheme.colorScheme.secondary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-        }
+        LoadingComponent()
     }
 
     if (failure) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .background(Color.Red)
-                    .padding(16.dp)
-            ) {
-                Text("Un problème est survenue : $message")
-            }
-            Button(onClick = { viewModel.fetchData() }) {
-                Text("Recharger la page")
-            }
-        }
-    } else {
+        FailureComponent(
+            message = message,
+            onButtonClick = { viewModel.fetchData() })
+    }
+
+    if (!failure && !loading) {
         if (lastTemperatures.isNotEmpty()) {
             var dates: Set<LocalDate> = lastTemperatures
                 .map { lastTemperature -> lastTemperature.collectionDate.toLocalDate() }
@@ -110,7 +93,7 @@ fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = viewModel(factory 
                 Alignment.CenterHorizontally
             ) {
                 Box(Modifier.height(100.dp)) {
-                    displayDates(dates)
+                    DisplayDates(dates)
                 }
 
                 // Text("Date de réception : ${collectionDate.format(DateTimeFormatter.ofPattern("dd / MM / yyyy"))}")
@@ -187,7 +170,7 @@ fun PortraitDisplay(
 }
 
 @Composable
-fun displayDates(dates: Set<LocalDate>) {
+fun DisplayDates(dates: Set<LocalDate>) {
     when(dates.size) {
         0 -> Text("Aucune date récupérée")
         1 -> Text("Températures prélevées le : " + dates.first().format(DateTimeFormatter.ofPattern("dd / MM / yyyy")))

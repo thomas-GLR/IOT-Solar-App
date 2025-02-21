@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,18 +27,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.solariotmobile.api.TemperatureWebService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.solariotmobile.ui.components.LoadingComponent
+import com.example.solariotmobile.ui.theme.FirstGreenForGradient
+import com.example.solariotmobile.ui.theme.ForestGreen
+import com.example.solariotmobile.ui.theme.MediumSeaGreen
+import com.example.solariotmobile.ui.theme.PrincipalGradient
 
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory)
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -67,12 +70,16 @@ fun SettingsScreen(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()) {
+        modifier = Modifier.fillMaxWidth()
+    ) {
         OutlinedTextField(
             value = address,
             onValueChange = {
                 address = it
-        },
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = FirstGreenForGradient
+            ),
             label = { Text("Adresse du serveur") }
         )
         OutlinedTextField(
@@ -80,28 +87,29 @@ fun SettingsScreen(
             onValueChange = {
                 port = it
             },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = FirstGreenForGradient
+            ),
             label = { Text("Port") }
         )
-        Button(onClick = {
-            viewModel.saveServerSettings(address, port)
-        }) {
+        Button(
+            onClick = { viewModel.saveServerSettings(address, port) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = FirstGreenForGradient
+            )
+        ) {
             Text("Enregistrer")
         }
-        Button(onClick = {
-            viewModel.fetchData(address, port)
-        }) {
+        Button(
+            onClick = { viewModel.fetchData(address, port) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = FirstGreenForGradient
+            )
+        ) {
             Text("Tester la connexion")
         }
         if (loading) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .width(64.dp)
-                        .align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.secondary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            }
+            LoadingComponent()
         }
         if (message.isNotEmpty()) {
             val backgroundColor: Color = if (failure) {

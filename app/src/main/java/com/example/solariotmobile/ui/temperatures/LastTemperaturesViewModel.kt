@@ -10,12 +10,15 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.solariotmobile.IOTSolarApplication
 import com.example.solariotmobile.api.RetrofitProvider
 import com.example.solariotmobile.api.TemperatureWebService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class LastTemperaturesViewModel(private val retrofitProvider: RetrofitProvider) : ViewModel() {
+@HiltViewModel
+class LastTemperaturesViewModel @Inject constructor(private val temperaturesRepository: TemperaturesRepository) : ViewModel() { // private val retrofitProvider: RetrofitProvider) : ViewModel() {
     private val _loading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> get() = _loading
     private val _failure = MutableLiveData(false)
@@ -32,51 +35,24 @@ class LastTemperaturesViewModel(private val retrofitProvider: RetrofitProvider) 
         _lastTemperatures.value = mutableListOf()
         viewModelScope.launch {
             try {
+                val response = temperaturesRepository.getLastTemperatures()
 
-                val retrofit = retrofitProvider.getRetrofit()
-                val temperaturesWebService: TemperatureWebService =
-                    retrofit.create(TemperatureWebService::class.java)
+                _loading.value = false
 
-                val callGetLastTemperatures = temperaturesWebService.getLastTemperatures()
-
-                callGetLastTemperatures.enqueue(object : Callback<List<TemperatureDto>> {
-                    override fun onResponse(
-                        call: Call<List<TemperatureDto>>,
-                        response: Response<List<TemperatureDto>>
-                    ) {
-                        if (response.isSuccessful) {
-                            _loading.value = false
-                            _failure.value = false
-                            _lastTemperatures.value = response.body() as List<TemperatureDto>
-                        } else {
-                            _failure.value = true
-                            _loading.value = false
-                            _message.value = response.message() ?: "Erreur inconnue"
-                        }
-                    }
-
-                    override fun onFailure(call: Call<List<TemperatureDto>>, throwable: Throwable) {
-                        _failure.value = true
-                        _loading.value = false
-                        _message.value = throwable.message ?: "Erreur inconnue"
-                    }
-
-                })
+                if (response.isSuccessful) {
+                    _lastTemperatures.value =
+                        if (response.body() == null) emptyList() else response.body()
+                } else {
+                    _failure.value = true
+                    _message.value =
+                        if (response.errorBody() == null) "Une erreur est survenue lors de la récupération des dernières températures" else response.errorBody()
+                            .toString()
+                }
             } catch (exception: Exception) {
                 _failure.value = true
                 _loading.value = false
                 _message.value = exception.message ?: "Erreur inconnue"
             }
-    }
-}
-
-companion object {
-    val Factory: ViewModelProvider.Factory = viewModelFactory {
-        initializer {
-            val application =
-                this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as IOTSolarApplication
-            LastTemperaturesViewModel(application.retrofitProvider)
         }
     }
-}
 }
