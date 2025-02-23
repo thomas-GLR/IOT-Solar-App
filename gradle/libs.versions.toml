@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.0"
+beetablescompose = "1.2.0"
 converterGson = "2.11.0"
 converterScalars = "2.11.0"
 datastorePreferences = "1.1.2"
@@ -29,6 +30,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-material = { module = "androidx.compose.material:material" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+beetablescompose = { module = "com.github.Breens-Mbaka:BeeTablesCompose", version.ref = "beetablescompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "converterScalars" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }

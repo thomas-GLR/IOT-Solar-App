@@ -68,6 +68,9 @@ dependencies {
 
     implementation(libs.androidx.material.icons.extended)
 
+    // Table
+    implementation(libs.beetablescompose)
+
     implementation(libs.converter.scalars)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.core.ktx)

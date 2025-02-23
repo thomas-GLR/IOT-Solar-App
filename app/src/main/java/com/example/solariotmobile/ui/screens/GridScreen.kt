@@ -1,28 +1,22 @@
 package com.example.solariotmobile.ui.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.breens.beetablescompose.BeeTablesCompose
 import com.example.solariotmobile.ui.components.FailureWithRefresh
 import com.example.solariotmobile.ui.components.Loading
-import com.example.solariotmobile.ui.temperatures.ReadingDeviceName
 import com.example.solariotmobile.ui.temperatures.TemperatureDto
-import java.time.format.DateTimeFormatter
 
 @Composable
-fun GridScreen(viewModel: TemperaturesViewModel = viewModel(factory = TemperaturesViewModel.Factory)) {
+fun GridScreen(viewModel: TemperaturesViewModel = hiltViewModel()) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     var loading by remember { mutableStateOf(false) }
@@ -54,25 +48,40 @@ fun GridScreen(viewModel: TemperaturesViewModel = viewModel(factory = Temperatur
         FailureWithRefresh(message) { viewModel.fetchData() }
     } else {
 
+        // https://developer.android.com/develop/ui/compose/lists?hl=fr
+
         Column {
             FilterMenu(viewModel)
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(temperatures) { temperature ->
+            val tableHeaders = listOf("Températures", "Date", "Sonde")
 
-                    val readingDeviceName = when (temperature.readingDeviceName) {
-                        ReadingDeviceName.TOP -> "Haut"
-                        ReadingDeviceName.MIDDLE -> "Milieu"
-                        ReadingDeviceName.BOTTOM -> "Bas"
-                    }
-                    Row {
-                        Text("${temperature.temperature}")
-                        Text(temperature.collectionDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm")))
-                        Text(readingDeviceName)
-                    }
-                }
-            }
+            BeeTablesCompose(
+                data = temperatures,
+                headerTableTitles = tableHeaders,
+                dividerThickness = 0.8.dp,
+                columnToIndexIncreaseWidth = 2,
+                disableVerticalDividers = true,
+            )
         }
+
+//        Column {
+//            FilterMenu(viewModel)
+//            LazyColumn(
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                items(temperatures) { temperature ->
+//
+//                    val readingDeviceName = when (temperature.readingDeviceName) {
+//                        ReadingDeviceName.TOP -> "Haut"
+//                        ReadingDeviceName.MIDDLE -> "Milieu"
+//                        ReadingDeviceName.BOTTOM -> "Bas"
+//                    }
+//                    Row {
+//                        Text("${temperature.temperature}")
+//                        Text(temperature.collectionDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm")))
+//                        Text(readingDeviceName)
+//                    }
+//                }
+//            }
+//        }
     }
 }
