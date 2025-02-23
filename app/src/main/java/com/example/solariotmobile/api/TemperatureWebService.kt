@@ -14,7 +14,7 @@ interface TemperatureWebService {
     suspend fun getLastTemperatures(): Response<List<TemperatureDto>>
 
     @GET("temperatures")
-    fun getTemperatures():  Call<List<TemperatureDto>>
+    suspend fun getTemperatures():  Response<List<TemperatureDto>>
 
     @GET("/")
     fun getHelloWorld(): Call<String>

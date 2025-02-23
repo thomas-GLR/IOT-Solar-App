@@ -1,99 +1,127 @@
 package com.example.solariotmobile.ui.grid
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MultiChoiceSegmentedButtonRow
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.example.solariotmobile.ui.components.DateRangePickerModal
 import com.example.solariotmobile.ui.temperatures.ReadingDeviceName
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun FilterMenu(
     viewModel: TemperaturesViewModel
 ) {
-    val isDropDownExpanded = remember {
-        mutableStateOf(false)
-    }
-    val selectedReadingDeviceName = remember {
-        mutableStateOf(emptyList<ReadingDeviceName>())
-    }
+    val readingDeviceByName = mapOf(
+        ReadingDeviceName.TOP to "Haut",
+        ReadingDeviceName.MIDDLE to "Milieu",
+        ReadingDeviceName.BOTTOM to "Bas"
+    )
+
+    val readingDevices = readingDeviceByName.keys.toList()
+
+    val selectedReadingDeviceName = remember { mutableStateListOf<ReadingDeviceName>() }
+    selectedReadingDeviceName.addAll(readingDevices)
+
     val selectedDateRange = remember {
         mutableStateOf<Pair<Long?, Long?>>(null to null)
     }
 
     var showRangeModal by remember { mutableStateOf(false) }
 
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Box {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    isDropDownExpanded.value = true
-                }
-            ) {
-                Text(text = "Capteur")
+    val datesRangeInformation = if (selectedDateRange.value != null to null && selectedDateRange.value.first != null && selectedDateRange.value.second != null)
+        "${LocalDateTime.ofInstant(Instant.ofEpochMilli(selectedDateRange.value.first!!), ZoneOffset.UTC).toLocalDate().format(
+        DateTimeFormatter.ofPattern("dd / MM / yyyy"))} - ${LocalDateTime.ofInstant(Instant.ofEpochMilli(selectedDateRange.value.second!!), ZoneOffset.UTC).toLocalDate().format(
+        DateTimeFormatter.ofPattern("dd / MM / yyyy"))}" else "Aucune dates sélectionnées"
+
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(datesRangeInformation)
+            IconButton(onClick = { showRangeModal = !showRangeModal }) {
+                Icon(
+                    imageVector = Icons.Filled.DateRange,
+                    contentDescription = "Favorite"
+                )
             }
-//            Button(onClick = { isDropDownExpanded.value = true }) {
-//                Text("Capteur")
-//            }
-//            OutlinedTextField(
-//                modifier = Modifier.clickable {
-//                    isDropDownExpanded.value = true
-//                },
-//                readOnly = true,
-//                value = selectedReadingDeviceName.joinToString { ", " },
-//                onValueChange = {  },
-//                label = { Text("Capteur") }
-//            )
-            DropdownMenu(
-                expanded = isDropDownExpanded.value,
-                onDismissRequest = {
-                    isDropDownExpanded.value = false
+            if (showRangeModal) {
+                DateRangePickerModal(
+                    onDateRangeSelected = {
+                        selectedDateRange.value = it
+                        viewModel.filterCollectionDateOfTemperatures(selectedDateRange.value)
+                        showRangeModal = false
+                    },
+                    onDismiss = { showRangeModal = false }
+                )
+            }
+            Button(
+                onClick = {
+                    viewModel.resetFilters()
+                    selectedDateRange.value = null to null
+
+                    selectedReadingDeviceName.clear()
+                    selectedReadingDeviceName.addAll(readingDevices)
                 }
             ) {
-                ReadingDeviceName.entries.forEach { value ->
-                    selectedReadingDeviceName.value
-                    DropdownMenuItem(
-                        text = { Text(value.name) },
-                        modifier = if (selectedReadingDeviceName.value.contains(value)) Modifier.background(Color.LightGray) else Modifier,
-                        onClick = {
-                            selectedReadingDeviceName.value = selectedReadingDeviceName.value.toMutableList().apply {
-                                if (contains(value)) remove(value) else add(value)
+                Text("Réinitialiser les filtres")
+            }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            MultiChoiceSegmentedButtonRow {
+                readingDevices.forEachIndexed { index, readingDeviceKey ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = readingDevices.size
+                        ),
+                        onCheckedChange = {
+                            if (readingDeviceKey in selectedReadingDeviceName) {
+                                selectedReadingDeviceName.remove(readingDeviceKey)
+                                viewModel.filterReadingDevices(selectedReadingDeviceName)
+                            } else {
+                                selectedReadingDeviceName.add(readingDeviceKey)
+                                viewModel.filterReadingDevices(selectedReadingDeviceName)
                             }
-                        }
-                    )
+                        },
+                        checked = readingDeviceKey in selectedReadingDeviceName
+                    ) {
+                        Text(
+                            if (readingDeviceByName.containsKey(readingDeviceKey))
+                                readingDeviceByName[readingDeviceKey]!!
+                            else "Le label : $readingDeviceKey n'existe pas"
+                        )
+                    }
                 }
             }
-        }
-        Button(onClick = { showRangeModal = !showRangeModal }) {
-            Text("Dates")
-        }
-        if (showRangeModal) {
-            DateRangePickerModal(
-                onDateRangeSelected = {
-                    selectedDateRange.value = it
-                    showRangeModal = false
-                },
-                onDismiss = { showRangeModal = false }
-            )
-        }
-        Button(onClick = { viewModel.filterTemperatures(selectedReadingDeviceName.value, selectedDateRange.value) }) {
-            Text("Filtrer")
         }
     }
+
 }
