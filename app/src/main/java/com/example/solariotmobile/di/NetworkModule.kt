@@ -1,6 +1,8 @@
 package com.example.solariotmobile.di
 
+import com.example.solariotmobile.api.AuthInterceptor
 import com.example.solariotmobile.api.TemperatureWebService
+import com.example.solariotmobile.api.TokenAuthenticator
 import com.example.solariotmobile.ui.settings.SettingRepository
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
@@ -10,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDateTime
@@ -19,9 +22,22 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
+
     @Provides
     @Singleton
-    fun provideRetrofit(settingRepository: SettingRepository): Retrofit {
+    fun provideHttpClient(
+        authInterceptor: AuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .authenticator(tokenAuthenticator)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(client: OkHttpClient, settingRepository: SettingRepository): Retrofit {
 
         val serverAddress = runBlocking { settingRepository.getServerAddress.first() }
         val serverPort = runBlocking { settingRepository.getServerPort.first() }
@@ -39,6 +55,7 @@ class NetworkModule {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(client)
             .build()
     }
 
