@@ -37,37 +37,51 @@ class SettingsViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val retrofit = Retrofit.Builder()
-                    .baseUrl("http://${address}:${port}")
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .build()
-                val temperaturesWebService: TemperatureWebService =
-                    retrofit.create(TemperatureWebService::class.java)
+                val response = settingRepository.getHelloWorld()
 
-                val callGetHelloWorld = temperaturesWebService.getHelloWorld()
-                callGetHelloWorld.enqueue(object : Callback<String> {
-                    override fun onResponse(
-                        call: Call<String>,
-                        response: Response<String>
-                    ) {
-                        if (response.isSuccessful) {
-                            _loading.value = false
-                            _failure.value = false
-                            _message.value = "Connexion réussie !"
-                        } else {
-                            _failure.value = true
-                            _loading.value = false
-                            _message.value = response.message() ?: "Erreur inconnue"
-                        }
-                    }
+                _loading.value = false
 
-                    override fun onFailure(call: Call<String>, throwable: Throwable) {
-                        _failure.value = true
+                if (response.isSuccessful) {
+                    if (response.body() != null) {
                         _loading.value = false
-                        _message.value = throwable.message ?: "Erreur inconnue"
+                        _failure.value = false
+                        _message.value = "Connexion réussie !"
                     }
-
-                })
+                } else {
+                    _failure.value = true
+                    _message.value = if (response.errorBody() != null) response.errorBody()!!.string() else "Une erreur est survenue"
+                }
+//                val retrofit = Retrofit.Builder()
+//                    .baseUrl("http://${address}:${port}")
+//                    .addConverterFactory(ScalarsConverterFactory.create())
+//                    .build()
+//                val temperaturesWebService: TemperatureWebService =
+//                    retrofit.create(TemperatureWebService::class.java)
+//
+//                val callGetHelloWorld = temperaturesWebService.getHelloWorld()
+//                callGetHelloWorld.enqueue(object : Callback<String> {
+//                    override fun onResponse(
+//                        call: Call<String>,
+//                        response: Response<String>
+//                    ) {
+//                        if (response.isSuccessful) {
+//                            _loading.value = false
+//                            _failure.value = false
+//                            _message.value = "Connexion réussie !"
+//                        } else {
+//                            _failure.value = true
+//                            _loading.value = false
+//                            _message.value = response.message() ?: "Erreur inconnue"
+//                        }
+//                    }
+//
+//                    override fun onFailure(call: Call<String>, throwable: Throwable) {
+//                        _failure.value = true
+//                        _loading.value = false
+//                        _message.value = throwable.message ?: "Erreur inconnue"
+//                    }
+//
+//                })
             } catch (exception: Exception) {
                 _failure.value = true
                 _loading.value = false
@@ -83,8 +97,25 @@ class SettingsViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = ""
             )
+
     val serverPortState: StateFlow<String> =
         settingRepository.getServerPort.map { serverName -> serverName }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = ""
+            )
+
+    val serverUsernameState: StateFlow<String> =
+        settingRepository.getServerUsername.map { serverName -> serverName }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = ""
+            )
+
+    val serverPasswordState: StateFlow<String> =
+        settingRepository.getServerPassword.map { serverName -> serverName }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
@@ -103,9 +134,9 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun saveServerSettings(serverAddress: String, serverPort: String) {
+    fun saveServerSettings(serverAddress: String, serverPort: String, username: String, password: String) {
         viewModelScope.launch {
-            settingRepository.saveServerSettings(serverAddress, serverPort)
+            settingRepository.saveServerSettings(serverAddress, serverPort, username, password)
         }
     }
 }

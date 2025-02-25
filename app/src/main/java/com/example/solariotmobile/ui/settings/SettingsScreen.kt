@@ -7,9 +7,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -26,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -44,12 +51,16 @@ fun SettingsScreen(
 
     val serverAddress by viewModel.serverAddressState.collectAsState()
     val serverPort by viewModel.serverPortState.collectAsState()
+    val serverUsername by viewModel.serverUsernameState.collectAsState()
+    val serverPassword by viewModel.serverPasswordState.collectAsState()
 
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var port by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     viewModel.isLoading.observe(lifecycleOwner) { isLoading ->
         loading = isLoading
@@ -66,6 +77,8 @@ fun SettingsScreen(
     LaunchedEffect(serverAddress, serverPort) {
         address = serverAddress
         port = serverPort
+        username = serverUsername
+        password = serverPassword
     }
 
     Column(
@@ -92,8 +105,38 @@ fun SettingsScreen(
             ),
             label = { Text("Port") }
         )
+        OutlinedTextField(
+            value = username,
+            onValueChange = {
+                username = it
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = FirstGreenForGradient
+            ),
+            label = { Text("Nom d'utilisateur") },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                IconButton(onClick = { /* Toggle password visibility */ }) {
+                    Icon(
+                        imageVector = Icons.Default.Visibility,
+                        contentDescription = "Toggle password visibility"
+                    )
+                }
+            }
+        )
+        OutlinedTextField(
+            value = password,
+            onValueChange = {
+                password = it
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = FirstGreenForGradient
+            ),
+            label = { Text("Mot de passe") }
+        )
         Button(
-            onClick = { viewModel.saveServerSettings(address, port) },
+            onClick = { viewModel.saveServerSettings(address, port, username, password) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = FirstGreenForGradient
             )

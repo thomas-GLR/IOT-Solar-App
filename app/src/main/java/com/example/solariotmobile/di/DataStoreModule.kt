@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.solariotmobile.api.TemperatureWebService
 import com.example.solariotmobile.ui.settings.SettingRepository
 import dagger.Module
 import dagger.Provides
@@ -27,7 +28,7 @@ class DataStoreModule {
 
     @Provides
     @Singleton
-    fun provideSettingRepository(dataStore: DataStore<Preferences>): SettingRepository {
-        return SettingRepository(dataStore)
+    fun provideSettingRepository(dataStore: DataStore<Preferences>, temperatureWebService: TemperatureWebService): SettingRepository {
+        return SettingRepository(dataStore, temperatureWebService)
     }
 }

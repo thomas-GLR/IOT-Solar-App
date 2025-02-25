@@ -23,17 +23,23 @@ class TokenManager @Inject constructor(@ApplicationContext context: Context) {
     companion object {
         val TOKEN_KEY = stringPreferencesKey("jwt_token")
         val TOKEN_DATE = stringPreferencesKey("jwt_date")
+        val REFRESH_TOKEN_KEY = stringPreferencesKey("jwt_refresh_token")
     }
 
-    suspend fun saveToken(token: String) {
+    suspend fun saveToken(token: String, refreshToken: String) {
         dataStore.edit { prefs ->
             prefs[TOKEN_KEY] = token
             prefs[TOKEN_DATE] = now().toString()
+            prefs[REFRESH_TOKEN_KEY] = refreshToken
         }
     }
 
     suspend fun getToken(): String? {
         return dataStore.data.map { prefs -> prefs[TOKEN_KEY] }.firstOrNull()
+    }
+
+    suspend fun getRefreshToken(): String? {
+        return dataStore.data.map { prefs -> prefs[REFRESH_TOKEN_KEY] }.firstOrNull()
     }
 
     suspend fun isTokenValid(): Boolean {
@@ -50,6 +56,7 @@ class TokenManager @Inject constructor(@ApplicationContext context: Context) {
         dataStore.edit {
             it.remove(TOKEN_KEY)
             it.remove(TOKEN_DATE)
+            it.remove(REFRESH_TOKEN_KEY)
         }
     }
 }
