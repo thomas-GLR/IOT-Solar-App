@@ -4,14 +4,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.solariotmobile.api.TemperatureWebService
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class SettingRepository @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
-    private val temperatureWebService: TemperatureWebService
+    private val dataStore: DataStore<Preferences>
 ) {
 
     private var host: String = ""
@@ -24,9 +23,9 @@ class SettingRepository @Inject constructor(
         val SERVER_PORT = stringPreferencesKey("server_port")
         val SERVER_USERNAME = stringPreferencesKey("server_username")
         val SERVER_PASSWORD = stringPreferencesKey("server_password")
+        val TOKEN_KEY = stringPreferencesKey("jwt_token")
+        val REFRESH_TOKEN_KEY = stringPreferencesKey("jwt_refresh_token")
     }
-
-    suspend fun getHelloWorld() = temperatureWebService.getHelloWorld()
 
     val getServerAddress: Flow<String> = dataStore.data
         .map { preferences ->
@@ -70,11 +69,35 @@ class SettingRepository @Inject constructor(
         username: String,
         password: String
     ) {
+        clearToken()
         dataStore.edit { preferences ->
             preferences[SERVER_ADDRESS] = serverAddress
             preferences[SERVER_PORT] = serverPort
             preferences[SERVER_USERNAME] = username
             preferences[SERVER_PASSWORD] = password
+        }
+    }
+
+    // Gestion du Token
+    suspend fun saveToken(token: String, refreshToken: String) {
+        dataStore.edit { prefs ->
+            prefs[TOKEN_KEY] = token
+            prefs[REFRESH_TOKEN_KEY] = refreshToken
+        }
+    }
+
+    suspend fun getToken(): String? {
+        return dataStore.data.map { prefs -> prefs[TOKEN_KEY] }.firstOrNull()
+    }
+
+    suspend fun getRefreshToken(): String? {
+        return dataStore.data.map { prefs -> prefs[REFRESH_TOKEN_KEY] }.firstOrNull()
+    }
+
+    suspend fun clearToken() {
+        dataStore.edit {
+            it.remove(TOKEN_KEY)
+            it.remove(REFRESH_TOKEN_KEY)
         }
     }
 }

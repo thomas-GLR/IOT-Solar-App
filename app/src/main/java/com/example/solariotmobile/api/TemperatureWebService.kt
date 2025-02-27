@@ -13,7 +13,7 @@ interface TemperatureWebService {
     suspend fun getLastTemperatures(): Response<List<TemperatureDto>>
 
     @GET("/")
-    fun getHelloWorld(): Response<String>
+    fun getHelloWorld(): Call<String>
 
     @GET("resistance")
     suspend fun getLastResistanceState(): Response<ResistanceStateDto>
@@ -29,4 +29,8 @@ interface TemperatureWebService {
 
     @POST("auth/login")
     suspend fun login(@Body loginDto: LoginDto): Response<TokenResponse>
+
+    @POST("auth/login")
+    fun loginWithCall(@Body loginDto: LoginDto): Call<TokenResponse>
+
 }

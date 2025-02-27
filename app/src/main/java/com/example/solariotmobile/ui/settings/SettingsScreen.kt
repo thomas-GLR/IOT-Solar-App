@@ -5,21 +5,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,12 +32,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.solariotmobile.ui.components.LoadingComponent
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
-import com.example.solariotmobile.ui.theme.ForestGreen
-import com.example.solariotmobile.ui.theme.MediumSeaGreen
-import com.example.solariotmobile.ui.theme.PrincipalGradient
 
 @Composable
 fun SettingsScreen(
@@ -113,17 +105,7 @@ fun SettingsScreen(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = FirstGreenForGradient
             ),
-            label = { Text("Nom d'utilisateur") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            trailingIcon = {
-                IconButton(onClick = { /* Toggle password visibility */ }) {
-                    Icon(
-                        imageVector = Icons.Default.Visibility,
-                        contentDescription = "Toggle password visibility"
-                    )
-                }
-            }
+            label = { Text("Nom d'utilisateur") }
         )
         OutlinedTextField(
             value = password,
@@ -133,7 +115,9 @@ fun SettingsScreen(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = FirstGreenForGradient
             ),
-            label = { Text("Mot de passe") }
+            label = { Text("Mot de passe") },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
         Button(
             onClick = { viewModel.saveServerSettings(address, port, username, password) },
@@ -144,7 +128,7 @@ fun SettingsScreen(
             Text("Enregistrer")
         }
         Button(
-            onClick = { viewModel.fetchData(address, port) },
+            onClick = { viewModel.fetchData(address, port, username, password) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = FirstGreenForGradient
             )

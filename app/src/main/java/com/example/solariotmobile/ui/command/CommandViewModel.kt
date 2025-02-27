@@ -2,6 +2,7 @@ package com.example.solariotmobile.ui.command
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.solariotmobile.utils.ErrorResponseFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +42,7 @@ class CommandViewModel @Inject constructor(private val repository: CommandReposi
                     }
                 } else {
                     _failure.value = true
-                    _message.value = if (response.errorBody() != null) response.errorBody()!!.string() else "Une erreur est survenue"
+                    _message.value = ErrorResponseFactory.createErrorMessage(response.code(), response.errorBody())
                 }
             } catch (exception: Exception) {
                 _loading.value = false;
