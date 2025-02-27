@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.solariotmobile.IOTSolarApplication
 import com.example.solariotmobile.api.RetrofitProvider
 import com.example.solariotmobile.api.TemperatureWebService
+import com.example.solariotmobile.utils.ErrorResponseFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -44,9 +45,7 @@ class LastTemperaturesViewModel @Inject constructor(private val temperaturesRepo
                         if (response.body() == null) emptyList() else response.body()
                 } else {
                     _failure.value = true
-                    _message.value =
-                        if (response.errorBody() == null) "Une erreur est survenue lors de la récupération des dernières températures" else response.errorBody()
-                            .toString()
+                    _message.value = ErrorResponseFactory.createErrorMessage(response.code(), response.errorBody())
                 }
             } catch (exception: Exception) {
                 _failure.value = true

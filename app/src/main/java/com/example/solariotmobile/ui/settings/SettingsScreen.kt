@@ -5,16 +5,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,15 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.solariotmobile.ui.components.LoadingComponent
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
-import com.example.solariotmobile.ui.theme.ForestGreen
-import com.example.solariotmobile.ui.theme.MediumSeaGreen
-import com.example.solariotmobile.ui.theme.PrincipalGradient
 
 @Composable
 fun SettingsScreen(
@@ -44,12 +43,16 @@ fun SettingsScreen(
 
     val serverAddress by viewModel.serverAddressState.collectAsState()
     val serverPort by viewModel.serverPortState.collectAsState()
+    val serverUsername by viewModel.serverUsernameState.collectAsState()
+    val serverPassword by viewModel.serverPasswordState.collectAsState()
 
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var port by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     viewModel.isLoading.observe(lifecycleOwner) { isLoading ->
         loading = isLoading
@@ -66,6 +69,8 @@ fun SettingsScreen(
     LaunchedEffect(serverAddress, serverPort) {
         address = serverAddress
         port = serverPort
+        username = serverUsername
+        password = serverPassword
     }
 
     Column(
@@ -92,8 +97,30 @@ fun SettingsScreen(
             ),
             label = { Text("Port") }
         )
+        OutlinedTextField(
+            value = username,
+            onValueChange = {
+                username = it
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = FirstGreenForGradient
+            ),
+            label = { Text("Nom d'utilisateur") }
+        )
+        OutlinedTextField(
+            value = password,
+            onValueChange = {
+                password = it
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = FirstGreenForGradient
+            ),
+            label = { Text("Mot de passe") },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
         Button(
-            onClick = { viewModel.saveServerSettings(address, port) },
+            onClick = { viewModel.saveServerSettings(address, port, username, password) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = FirstGreenForGradient
             )
@@ -101,7 +128,7 @@ fun SettingsScreen(
             Text("Enregistrer")
         }
         Button(
-            onClick = { viewModel.fetchData(address, port) },
+            onClick = { viewModel.fetchData(address, port, username, password) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = FirstGreenForGradient
             )

@@ -1,7 +1,6 @@
 package com.example.solariotmobile.api
 
 import com.example.solariotmobile.ui.command.ResistanceStateDto
-import com.example.solariotmobile.ui.settings.HelloWorldDto
 import com.example.solariotmobile.ui.temperatures.TemperatureDto
 import retrofit2.Call
 import retrofit2.Response
@@ -24,4 +23,14 @@ interface TemperatureWebService {
 
     @POST("resistance")
     suspend fun createResistanceState(@Body resistanceStateDto: ResistanceStateDto): Response<ResistanceStateDto>
+
+    @POST("auth/refresh")
+    suspend fun refreshToken(@Body refreshToken: String): Response<TokenResponse>
+
+    @POST("auth/login")
+    suspend fun login(@Body loginDto: LoginDto): Response<TokenResponse>
+
+    @POST("auth/login")
+    fun loginWithCall(@Body loginDto: LoginDto): Call<TokenResponse>
+
 }
