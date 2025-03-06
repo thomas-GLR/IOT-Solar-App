@@ -42,7 +42,10 @@ class NetworkModule {
         val serverAddress = runBlocking { settingRepository.getServerAddress.first() }
         val serverPort = runBlocking { settingRepository.getServerPort.first() }
 
-        val baseUrl = "http://$serverAddress:$serverPort/"
+        val fallbackAddress = "localhost"
+        val fallbackPort = "3000"
+
+        val baseUrl = "http://${serverAddress.takeIf { it.isNotEmpty() } ?: fallbackAddress}:${serverPort.takeIf { it.isNotEmpty() } ?: fallbackPort}/"
 
         // On veut pouvoir déserialiser les dates avec le format ISO_OFFSET_DATE_TIME pour simplifier la communication entre l'API et nestJs et le mobile
         val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
