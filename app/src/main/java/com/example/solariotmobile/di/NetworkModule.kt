@@ -38,7 +38,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(client: OkHttpClient, settingRepository: SettingRepository): Retrofit {
-
+        println("NetworkModule : appel")
         val serverAddress = runBlocking { settingRepository.getServerAddress.first() }
         val serverPort = runBlocking { settingRepository.getServerPort.first() }
 

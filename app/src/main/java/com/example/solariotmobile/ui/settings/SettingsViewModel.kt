@@ -23,8 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val settingRepository: SettingRepository,
-    private val temperatureWebService: TemperatureWebService
+    private val settingRepository: SettingRepository
 ) : ViewModel() {
     private val _loading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> get() = _loading
@@ -113,8 +112,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun testConnexion() = temperatureWebService.getHelloWorld()
-
     val serverAddressState: StateFlow<String> =
         settingRepository.getServerAddress.map { serverName -> serverName }
             .stateIn(
@@ -132,7 +129,7 @@ class SettingsViewModel @Inject constructor(
             )
 
     val serverUsernameState: StateFlow<String> =
-        settingRepository.getServerUsername.map { serverName -> serverName }
+        settingRepository.getServerUsername.map { username -> username }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
@@ -140,7 +137,7 @@ class SettingsViewModel @Inject constructor(
             )
 
     val serverPasswordState: StateFlow<String> =
-        settingRepository.getServerPassword.map { serverName -> serverName }
+        settingRepository.getServerPassword.map { password -> password }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),

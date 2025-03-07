@@ -22,6 +22,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -41,6 +43,7 @@ import com.example.solariotmobile.ui.settings.SettingsScreen
 import com.example.solariotmobile.ui.temperatures.TemperaturesScreen
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
 sealed class NavDestination(val title: String, val route: String, val icon: ImageVector) {
     object Temperatures: NavDestination(title = "Temperatures", route = "temperatures", icon = Icons.Filled.Home)
@@ -131,12 +134,16 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun NavigationHost(
+        viewModel: MainActivityViewModel = hiltViewModel(),
         navController: NavHostController,
         innerPadding: PaddingValues
     ) {
+
+        val isConnexionInformationValid = viewModel.isValidConnexionInformation()
+
         NavHost(
             navController = navController,
-            startDestination = NavDestination.Temperatures.route,
+            startDestination = if (!isConnexionInformationValid) NavDestination.Settings.route else NavDestination.Temperatures.route,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
