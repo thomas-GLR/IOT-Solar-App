@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +17,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FailureComponent(
     message: String,
-    onButtonClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -32,9 +30,6 @@ fun FailureComponent(
                 .padding(16.dp)
         ) {
             Text("Un problème est survenue : $message")
-        }
-        Button(onClick = { onButtonClick() }) {
-            Text("Recharger la page")
         }
     }
 }

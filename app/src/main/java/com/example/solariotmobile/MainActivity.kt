@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -22,7 +22,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +42,6 @@ import com.example.solariotmobile.ui.settings.SettingsScreen
 import com.example.solariotmobile.ui.temperatures.TemperaturesScreen
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
 
 sealed class NavDestination(val title: String, val route: String, val icon: ImageVector) {
     object Temperatures: NavDestination(title = "Temperatures", route = "temperatures", icon = Icons.Filled.Home)
@@ -123,8 +121,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         NavigationHost(
-                            navController = navController,
-                            innerPadding = innerPadding
+                            navController = navController
                         )
                     }
                 }
@@ -135,18 +132,14 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun NavigationHost(
         viewModel: MainActivityViewModel = hiltViewModel(),
-        navController: NavHostController,
-        innerPadding: PaddingValues
+        navController: NavHostController
     ) {
 
         val isConnexionInformationValid = viewModel.isValidConnexionInformation()
 
         NavHost(
             navController = navController,
-            startDestination = if (!isConnexionInformationValid) NavDestination.Settings.route else NavDestination.Temperatures.route,
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
+            startDestination = if (!isConnexionInformationValid) NavDestination.Settings.route else NavDestination.Temperatures.route
         ) {
             composable(route = NavDestination.Temperatures.route) {
                 TemperaturesScreen()

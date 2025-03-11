@@ -1,8 +1,11 @@
 package com.example.solariotmobile.ui.command
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
@@ -36,10 +39,11 @@ fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
     LaunchedEffect(Unit) {
         viewModel.fetchLastResistanceState()
     }
-
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(50.dp, alignment = Alignment.CenterVertically),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(50.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (lastResistanceState.id == null) {
@@ -49,23 +53,20 @@ fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
             )
         } else {
             val resistanceStateInformation = if (isResistanceActive) " allumée " else " eteinte "
-            val resistanceStateUpdateDate = lastResistanceState.lastUpdate.format(DateTimeFormatter.ofPattern("dd / MM / yyyy"))
-            val resistanceStateUpdateTime = lastResistanceState.lastUpdate.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+            val resistanceStateUpdateDate =
+                lastResistanceState.lastUpdate.format(DateTimeFormatter.ofPattern("dd / MM / yyyy"))
+            val resistanceStateUpdateTime =
+                lastResistanceState.lastUpdate.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
             Text(
                 "La résistance a été $resistanceStateInformation le $resistanceStateUpdateDate à $resistanceStateUpdateTime",
                 color = Color.Black
             )
         }
 
-        if (loading) {
-            LoadingComponent()
-        }
-
         Switch(
             enabled = !loading,
             checked = isResistanceActive,
             onCheckedChange = {
-                viewModel.updateResistanceStateFromUi(it)
                 viewModel.createResistanceState(it)
             },
             colors = SwitchDefaults.colors(
@@ -76,8 +77,13 @@ fun CommandScreen(viewModel: CommandViewModel = hiltViewModel()) {
             ),
             modifier = Modifier.scale(1.5f)
         )
+
+        if (loading) {
+            LoadingComponent()
+        }
+
         if (failure) {
-            FailureComponent(message) { viewModel.fetchLastResistanceState() }
+            FailureComponent(message)
         }
     }
 }

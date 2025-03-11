@@ -54,6 +54,7 @@ class CommandViewModel @Inject constructor(private val repository: CommandReposi
 
     fun createResistanceState(currentState: Boolean) {
         viewModelScope.launch {
+            _loading.value = true
             _failure.value = false
             _message.value = ""
             try {
@@ -80,8 +81,8 @@ class CommandViewModel @Inject constructor(private val repository: CommandReposi
                 }
             } catch (exception: Exception) {
                 _isResistanceActive.value = _lastResistanceState.value.currentState
-                _loading.value = false;
-                _failure.value = true;
+                _loading.value = false
+                _failure.value = true
                 _message.value = if (exception.message != null) exception.message!! else "Une exception est survenue"
             }
         }
