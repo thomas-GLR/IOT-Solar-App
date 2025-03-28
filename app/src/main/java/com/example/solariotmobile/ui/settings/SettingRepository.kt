@@ -17,6 +17,7 @@ class SettingRepository @Inject constructor(
     private var port: String = ""
     private var username: String = ""
     private var password: String = ""
+    private var networkProtocol: String = ""
 
     private companion object {
         val SERVER_ADDRESS = stringPreferencesKey("server_address")
@@ -25,6 +26,7 @@ class SettingRepository @Inject constructor(
         val SERVER_PASSWORD = stringPreferencesKey("server_password")
         val TOKEN_KEY = stringPreferencesKey("jwt_token")
         val REFRESH_TOKEN_KEY = stringPreferencesKey("jwt_refresh_token")
+        val NETWORK_PROTOCOL = stringPreferencesKey("network_protocol")
     }
 
     val getServerAddress: Flow<String> = dataStore.data
@@ -37,6 +39,12 @@ class SettingRepository @Inject constructor(
         .map { preferences ->
             port = preferences[SERVER_PORT] ?: ""
             preferences[SERVER_PORT] ?: ""
+        }
+
+    val getNetworkProtocol: Flow<String> = dataStore.data
+        .map { preferences ->
+            networkProtocol = preferences[NETWORK_PROTOCOL] ?: ""
+            preferences[NETWORK_PROTOCOL] ?: ""
         }
 
     val getServerUsername: Flow<String> = dataStore.data
@@ -67,7 +75,8 @@ class SettingRepository @Inject constructor(
         serverAddress: String,
         serverPort: String,
         username: String,
-        password: String
+        password: String,
+        networkProtocol: String
     ) {
         clearToken()
         dataStore.edit { preferences ->
@@ -75,6 +84,7 @@ class SettingRepository @Inject constructor(
             preferences[SERVER_PORT] = serverPort
             preferences[SERVER_USERNAME] = username
             preferences[SERVER_PASSWORD] = password
+            preferences[NETWORK_PROTOCOL] = networkProtocol
         }
     }
 

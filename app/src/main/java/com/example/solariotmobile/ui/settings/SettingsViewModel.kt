@@ -32,8 +32,7 @@ class SettingsViewModel @Inject constructor(
     private val _message = MutableLiveData("")
     val getMessage: LiveData<String> get() = _message
 
-
-    fun fetchData(address: String, port: String, username: String, password: String) {
+    fun fetchData(address: String, port: String, username: String, password: String, networkProtocol: String) {
         _loading.value = true
         _failure.value = false
         _message.value = ""
@@ -41,7 +40,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://${address}:${port}")
+                    .baseUrl("${networkProtocol}://${address}:${port}")
                     .addConverterFactory(ScalarsConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
@@ -144,6 +143,14 @@ class SettingsViewModel @Inject constructor(
                 initialValue = ""
             )
 
+    val networkProtocolState: StateFlow<Boolean> =
+        settingRepository.getNetworkProtocol.map { networkProtocol -> networkProtocol == "https" }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = false
+            )
+
     fun saveServerAddress(serverAddress: String) {
         viewModelScope.launch {
             settingRepository.saveServerAddress(serverAddress)
@@ -156,9 +163,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun saveServerSettings(serverAddress: String, serverPort: String, username: String, password: String) {
+    fun saveServerSettings(serverAddress: String, serverPort: String, username: String, password: String, networkProtocol: String) {
+
         viewModelScope.launch {
-            settingRepository.saveServerSettings(serverAddress, serverPort, username, password)
+            settingRepository.saveServerSettings(serverAddress, serverPort, username, password, networkProtocol)
         }
+    }
+
+    fun getNetworkProtocol(isHttpsEnabled: Boolean): String {
+        return if (isHttpsEnabled) "https" else "http"
     }
 }

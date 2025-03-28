@@ -44,9 +44,18 @@ class TokenAuthenticator @Inject constructor(
                     port = serverPort
                 }.first()
 
+                val networkProtocol = runBlocking { settingRepository.getNetworkProtocol.first() }
+
                 try {
+
+                    val baseUrl = if (address.isNotEmpty() && port.isBlank()) {
+                        "${networkProtocol}://${address}"
+                    } else {
+                        "${networkProtocol}://${address}:${port}"
+                    }
+
                     val retrofit = Retrofit.Builder()
-                        .baseUrl("http://${address}:${port}")
+                        .baseUrl(baseUrl)
                         .addConverterFactory(ScalarsConverterFactory.create())
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
