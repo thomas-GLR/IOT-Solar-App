@@ -4,10 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -36,10 +34,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.solariotmobile.ui.command.CommandScreen
-import com.example.solariotmobile.ui.grid.GridScreen
-import com.example.solariotmobile.ui.settings.SettingsScreen
-import com.example.solariotmobile.ui.temperatures.TemperaturesScreen
+import com.example.solariotmobile.ui.screens.CommandScreen
+import com.example.solariotmobile.ui.screens.GridScreen
+import com.example.solariotmobile.ui.screens.SettingsScreen
+import com.example.solariotmobile.ui.screens.TemperaturesScreen
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 import dagger.hilt.android.AndroidEntryPoint
 

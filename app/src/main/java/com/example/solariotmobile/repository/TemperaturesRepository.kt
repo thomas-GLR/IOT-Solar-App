@@ -1,6 +1,6 @@
-package com.example.solariotmobile.ui.temperatures
+package com.example.solariotmobile.repository
 
-import com.example.solariotmobile.api.TemperatureWebService
+import com.example.solariotmobile.domain.TemperatureWebService
 import javax.inject.Inject
 
 class TemperaturesRepository @Inject constructor(private val temperatureWebService: TemperatureWebService) {

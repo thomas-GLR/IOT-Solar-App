@@ -1,4 +1,4 @@
-package com.example.solariotmobile.ui.temperatures
+package com.example.solariotmobile.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +29,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.solariotmobile.ui.components.FailureComponentWithRefreshButton
 import com.example.solariotmobile.ui.components.LoadingComponent
+import com.example.solariotmobile.viewmodel.LastTemperaturesViewModel
+import com.example.solariotmobile.data.ReadingDeviceName
+import com.example.solariotmobile.data.TemperatureDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

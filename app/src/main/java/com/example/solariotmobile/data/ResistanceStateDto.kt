@@ -1,4 +1,4 @@
-package com.example.solariotmobile.ui.command
+package com.example.solariotmobile.data
 
 import java.time.LocalDateTime
 

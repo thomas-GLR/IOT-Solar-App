@@ -1,6 +1,7 @@
-package com.example.solariotmobile.ui.command
+package com.example.solariotmobile.repository
 
-import com.example.solariotmobile.api.TemperatureWebService
+import com.example.solariotmobile.domain.TemperatureWebService
+import com.example.solariotmobile.data.ResistanceStateDto
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -1,6 +1,7 @@
-package com.example.solariotmobile.api
+package com.example.solariotmobile.domain
 
-import com.example.solariotmobile.ui.settings.SettingRepository
+import com.example.solariotmobile.data.LoginDto
+import com.example.solariotmobile.repository.SettingRepository
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -44,9 +45,18 @@ class TokenAuthenticator @Inject constructor(
                     port = serverPort
                 }.first()
 
+                val networkProtocol = runBlocking { settingRepository.getNetworkProtocol.first() }
+
                 try {
+
+                    val baseUrl = if (address.isNotEmpty() && port.isBlank()) {
+                        "${networkProtocol}://${address}"
+                    } else {
+                        "${networkProtocol}://${address}:${port}"
+                    }
+
                     val retrofit = Retrofit.Builder()
-                        .baseUrl("http://${address}:${port}")
+                        .baseUrl(baseUrl)
                         .addConverterFactory(ScalarsConverterFactory.create())
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()

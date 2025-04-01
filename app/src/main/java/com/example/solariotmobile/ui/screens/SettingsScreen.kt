@@ -1,23 +1,22 @@
-package com.example.solariotmobile.ui.settings
+package com.example.solariotmobile.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.SnackbarDefaults.backgroundColor
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -36,7 +36,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.solariotmobile.ui.components.LoadingComponent
+import com.example.solariotmobile.viewmodel.SettingsViewModel
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
+import com.example.solariotmobile.ui.theme.ForestGreen
+import com.example.solariotmobile.ui.theme.LightGreen
+import com.example.solariotmobile.ui.theme.MediumSeaGreen
+import com.example.solariotmobile.ui.theme.PaleGreen
 
 @Composable
 fun SettingsScreen(
@@ -48,6 +53,7 @@ fun SettingsScreen(
     val serverPort by viewModel.serverPortState.collectAsState()
     val serverUsername by viewModel.serverUsernameState.collectAsState()
     val serverPassword by viewModel.serverPasswordState.collectAsState()
+    val networkProtocol by viewModel.networkProtocolState.collectAsState()
 
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf(false) }
@@ -56,6 +62,7 @@ fun SettingsScreen(
     var port by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isHttpsEnabled by remember { mutableStateOf(false) }
 
     viewModel.isLoading.observe(lifecycleOwner) { isLoading ->
         loading = isLoading
@@ -74,6 +81,7 @@ fun SettingsScreen(
         port = serverPort
         username = serverUsername
         password = serverPassword
+        isHttpsEnabled = networkProtocol
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -121,8 +129,30 @@ fun SettingsScreen(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(16.dp)
+                .clickable { isHttpsEnabled = !isHttpsEnabled }
+        ) {
+            Text(text = "Utiliser HTTPS (securisé)")
+            Spacer(modifier = Modifier.height(8.dp))
+            Switch(
+                checked = isHttpsEnabled,
+                onCheckedChange = {
+                    isHttpsEnabled = it
+                },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = ForestGreen,
+                    checkedTrackColor = LightGreen,
+                    uncheckedThumbColor = MediumSeaGreen,
+                    uncheckedTrackColor = PaleGreen
+                ),
+                modifier = Modifier.scale(1.5f)
+            )
+        }
         Button(
-            onClick = { viewModel.saveServerSettings(address, port, username, password) },
+            onClick = { viewModel.saveServerSettings(address, port, username, password, viewModel.getNetworkProtocol(isHttpsEnabled)) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = FirstGreenForGradient
             )
@@ -130,7 +160,7 @@ fun SettingsScreen(
             Text("Enregistrer")
         }
         Button(
-            onClick = { viewModel.fetchData(address, port, username, password) },
+            onClick = { viewModel.fetchData(address, port, username, password, viewModel.getNetworkProtocol(isHttpsEnabled)) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = FirstGreenForGradient
             )
