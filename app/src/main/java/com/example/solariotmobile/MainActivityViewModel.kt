@@ -2,6 +2,7 @@ package com.example.solariotmobile
 
 import androidx.lifecycle.ViewModel
 import com.example.solariotmobile.repository.SettingRepository
+import com.example.solariotmobile.utils.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -17,24 +18,10 @@ class MainActivityViewModel @Inject constructor(private val settingRepository: S
         val serverPort = runBlocking { settingRepository.getServerPort.first() }
 
         // Si on utilise un nom de domaine plutot qu'un port
-        if (!isValidIpAddress(serverAddress) && serverAddress.isNotBlank() && serverPort.isBlank() && isValidPort(serverPort)) {
+        if (NetworkUtils.isDomainName(serverAddress)) {
             return true
         }
 
-        return isValidIpAddress(serverAddress) && isValidPort(serverPort)
-    }
-
-    private fun isValidIpAddress(ip: String): Boolean {
-        return try {
-            val address = InetAddress.getByName(ip)
-            address.hostAddress == ip && address is java.net.Inet4Address
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    private fun isValidPort(port: String): Boolean {
-        val portNumber = port.toIntOrNull() ?: return false
-        return portNumber in 0..65535
+        return NetworkUtils.isValidIpAddress(serverAddress) && NetworkUtils.isValidPort(serverPort)
     }
 }
