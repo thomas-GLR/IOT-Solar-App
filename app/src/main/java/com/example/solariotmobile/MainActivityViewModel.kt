@@ -1,7 +1,7 @@
 package com.example.solariotmobile
 
 import androidx.lifecycle.ViewModel
-import com.example.solariotmobile.ui.settings.SettingRepository
+import com.example.solariotmobile.repository.SettingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking

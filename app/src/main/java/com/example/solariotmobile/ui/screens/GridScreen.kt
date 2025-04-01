@@ -1,4 +1,4 @@
-package com.example.solariotmobile.ui.grid
+package com.example.solariotmobile.ui.screens
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text

@@ -1,6 +1,6 @@
-package com.example.solariotmobile.api
+package com.example.solariotmobile.domain
 
-import com.example.solariotmobile.ui.settings.SettingRepository
+import com.example.solariotmobile.repository.SettingRepository
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response

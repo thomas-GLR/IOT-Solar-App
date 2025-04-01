@@ -1,4 +1,4 @@
-package com.example.solariotmobile.ui.settings
+package com.example.solariotmobile.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

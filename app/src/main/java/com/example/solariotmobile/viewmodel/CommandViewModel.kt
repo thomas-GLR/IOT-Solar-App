@@ -1,7 +1,9 @@
-package com.example.solariotmobile.ui.command
+package com.example.solariotmobile.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.solariotmobile.repository.CommandRepository
+import com.example.solariotmobile.data.ResistanceStateDto
 import com.example.solariotmobile.utils.ErrorResponseFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

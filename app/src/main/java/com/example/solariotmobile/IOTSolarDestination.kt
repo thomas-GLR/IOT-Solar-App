@@ -7,10 +7,10 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.solariotmobile.ui.command.CommandScreen
-import com.example.solariotmobile.ui.grid.GridScreen
-import com.example.solariotmobile.ui.settings.SettingsScreen
-import com.example.solariotmobile.ui.temperatures.TemperaturesScreen
+import com.example.solariotmobile.ui.screens.CommandScreen
+import com.example.solariotmobile.ui.screens.GridScreen
+import com.example.solariotmobile.ui.screens.SettingsScreen
+import com.example.solariotmobile.ui.screens.TemperaturesScreen
 
 interface IOTSolarDestination {
     val icon: ImageVector

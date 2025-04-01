@@ -1,4 +1,4 @@
-package com.example.solariotmobile.ui.temperatures
+package com.example.solariotmobile.data
 
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime

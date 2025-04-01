@@ -1,12 +1,13 @@
-package com.example.solariotmobile.ui.settings
+package com.example.solariotmobile.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.solariotmobile.api.LoginDto
-import com.example.solariotmobile.api.TemperatureWebService
-import com.example.solariotmobile.api.TokenResponse
+import com.example.solariotmobile.data.LoginDto
+import com.example.solariotmobile.domain.TemperatureWebService
+import com.example.solariotmobile.domain.TokenResponse
+import com.example.solariotmobile.repository.SettingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

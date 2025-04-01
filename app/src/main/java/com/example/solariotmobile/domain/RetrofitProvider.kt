@@ -1,6 +1,6 @@
-package com.example.solariotmobile.api
+package com.example.solariotmobile.domain
 
-import com.example.solariotmobile.ui.settings.SettingRepository
+import com.example.solariotmobile.repository.SettingRepository
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import kotlinx.coroutines.flow.combine

@@ -1,9 +1,9 @@
 package com.example.solariotmobile.di
 
-import com.example.solariotmobile.api.AuthInterceptor
-import com.example.solariotmobile.api.TemperatureWebService
-import com.example.solariotmobile.api.TokenAuthenticator
-import com.example.solariotmobile.ui.settings.SettingRepository
+import com.example.solariotmobile.domain.AuthInterceptor
+import com.example.solariotmobile.domain.TemperatureWebService
+import com.example.solariotmobile.domain.TokenAuthenticator
+import com.example.solariotmobile.repository.SettingRepository
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import dagger.Module

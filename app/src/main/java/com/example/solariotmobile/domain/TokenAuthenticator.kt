@@ -1,6 +1,7 @@
-package com.example.solariotmobile.api
+package com.example.solariotmobile.domain
 
-import com.example.solariotmobile.ui.settings.SettingRepository
+import com.example.solariotmobile.data.LoginDto
+import com.example.solariotmobile.repository.SettingRepository
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking

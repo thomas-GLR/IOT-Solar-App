@@ -1,7 +1,8 @@
-package com.example.solariotmobile.api
+package com.example.solariotmobile.domain
 
-import com.example.solariotmobile.ui.command.ResistanceStateDto
-import com.example.solariotmobile.ui.temperatures.TemperatureDto
+import com.example.solariotmobile.data.LoginDto
+import com.example.solariotmobile.data.ResistanceStateDto
+import com.example.solariotmobile.data.TemperatureDto
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body

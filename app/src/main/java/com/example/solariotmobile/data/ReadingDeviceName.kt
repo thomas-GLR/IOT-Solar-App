@@ -1,4 +1,4 @@
-package com.example.solariotmobile.ui.temperatures
+package com.example.solariotmobile.data
 
 enum class ReadingDeviceName {
     TOP,
