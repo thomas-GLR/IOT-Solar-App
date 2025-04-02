@@ -1,13 +1,17 @@
 package com.example.solariotmobile.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.solariotmobile.MainActivityViewModel
 import com.example.solariotmobile.ui.screens.LoginScreen
 import com.example.solariotmobile.ui.screens.MainScreen
 import com.example.solariotmobile.ui.screens.SettingsScreen
+import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -17,6 +21,7 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun AppNavigation(
+    viewModel: MainActivityViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(navController = navController, startDestination = Screen.Login.route) {
@@ -38,6 +43,7 @@ fun AppNavigation(
         composable(Screen.Main.route) {
             MainScreen(
                 onLogout = {
+                    viewModel.deleteToken()
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Main.route) { inclusive = true }
                     }

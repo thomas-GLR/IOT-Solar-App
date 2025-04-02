@@ -65,7 +65,7 @@ class SettingRepository @Inject constructor(
         return dataStore.data.map { prefs -> prefs[REFRESH_TOKEN_KEY] }.firstOrNull()
     }
 
-    private suspend fun clearToken() {
+    suspend fun clearToken() {
         dataStore.edit {
             it.remove(TOKEN_KEY)
             it.remove(REFRESH_TOKEN_KEY)
