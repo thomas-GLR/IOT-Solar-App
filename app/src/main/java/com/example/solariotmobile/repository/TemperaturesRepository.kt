@@ -1,8 +1,8 @@
 package com.example.solariotmobile.repository
 
-import com.example.solariotmobile.domain.TemperatureWebService
+import com.example.solariotmobile.domain.ApiServiceProvider
 import javax.inject.Inject
 
-class TemperaturesRepository @Inject constructor(private val temperatureWebService: TemperatureWebService) {
-    suspend fun getLastTemperatures() = temperatureWebService.getLastTemperatures()
+class TemperaturesRepository @Inject constructor(private val apiServiceProvider: ApiServiceProvider) {
+    suspend fun getLastTemperatures() = apiServiceProvider.temperatureWebService.getLastTemperatures()
 }
