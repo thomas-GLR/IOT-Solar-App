@@ -115,7 +115,7 @@ fun LoginScreen(
                 )
             ) {
                 if (loginState is LoginState.Loading) {
-                    LoadingComponent()
+                    LoadingComponent(35.dp)
                 } else {
                     Text("Se connecter")
                 }
