@@ -13,17 +13,9 @@ class SettingRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
 
-    private var host: String = ""
-    private var port: String = ""
-    private var username: String = ""
-    private var password: String = ""
-    private var networkProtocol: String = ""
-
     private companion object {
         val SERVER_ADDRESS = stringPreferencesKey("server_address")
         val SERVER_PORT = stringPreferencesKey("server_port")
-        val SERVER_USERNAME = stringPreferencesKey("server_username")
-        val SERVER_PASSWORD = stringPreferencesKey("server_password")
         val TOKEN_KEY = stringPreferencesKey("jwt_token")
         val REFRESH_TOKEN_KEY = stringPreferencesKey("jwt_refresh_token")
         val NETWORK_PROTOCOL = stringPreferencesKey("network_protocol")
@@ -31,59 +23,28 @@ class SettingRepository @Inject constructor(
 
     val getServerAddress: Flow<String> = dataStore.data
         .map { preferences ->
-            host = preferences[SERVER_ADDRESS] ?: ""
             preferences[SERVER_ADDRESS] ?: ""
         }
 
     val getServerPort: Flow<String> = dataStore.data
         .map { preferences ->
-            port = preferences[SERVER_PORT] ?: ""
             preferences[SERVER_PORT] ?: ""
         }
 
     val getNetworkProtocol: Flow<String> = dataStore.data
         .map { preferences ->
-            networkProtocol = preferences[NETWORK_PROTOCOL] ?: ""
-            preferences[NETWORK_PROTOCOL] ?: ""
+            preferences[NETWORK_PROTOCOL] ?: "http"
         }
-
-    val getServerUsername: Flow<String> = dataStore.data
-        .map { preferences ->
-            username = preferences[SERVER_USERNAME] ?: ""
-            preferences[SERVER_USERNAME] ?: ""
-        }
-
-    val getServerPassword: Flow<String> = dataStore.data
-        .map { preferences ->
-            password = preferences[SERVER_PASSWORD] ?: ""
-            preferences[SERVER_PASSWORD] ?: ""
-        }
-
-    suspend fun saveServerAddress(serverAddress: String) {
-        dataStore.edit { preferences ->
-            preferences[SERVER_ADDRESS] = serverAddress
-        }
-    }
-
-    suspend fun saveServerPort(serverPort: String) {
-        dataStore.edit { preferences ->
-            preferences[SERVER_PORT] = serverPort
-        }
-    }
 
     suspend fun saveServerSettings(
         serverAddress: String,
         serverPort: String,
-        username: String,
-        password: String,
         networkProtocol: String
     ) {
         clearToken()
         dataStore.edit { preferences ->
             preferences[SERVER_ADDRESS] = serverAddress
             preferences[SERVER_PORT] = serverPort
-            preferences[SERVER_USERNAME] = username
-            preferences[SERVER_PASSWORD] = password
             preferences[NETWORK_PROTOCOL] = networkProtocol
         }
     }

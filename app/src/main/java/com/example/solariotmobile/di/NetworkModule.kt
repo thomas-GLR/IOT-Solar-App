@@ -1,9 +1,11 @@
 package com.example.solariotmobile.di
 
 import com.example.solariotmobile.domain.AuthInterceptor
+import com.example.solariotmobile.domain.AuthService
 import com.example.solariotmobile.domain.TemperatureWebService
 import com.example.solariotmobile.domain.TokenAuthenticator
 import com.example.solariotmobile.repository.SettingRepository
+import com.example.solariotmobile.utils.NetworkUtils
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import dagger.Module
@@ -37,24 +39,16 @@ class NetworkModule {
 
     @Provides
     fun provideRetrofit(client: OkHttpClient, settingRepository: SettingRepository): Retrofit {
-        println("NetworkModule : appel")
-        val serverAddress = runBlocking { settingRepository.getServerAddress.first() }
-        val serverPort = runBlocking { settingRepository.getServerPort.first() }
-        val networkProtocol = runBlocking { settingRepository.getNetworkProtocol.first() }
 
-        val fallbackAddress = "localhost"
-        val fallbackPort = "3000"
-        val fallbackNetworkProtocol = "http"
+        val serverAddressFromSettings = runBlocking { settingRepository.getServerAddress.first() }
+        val serverPortFromSettings = runBlocking { settingRepository.getServerPort.first() }
+        val networkProtocolFromSettings = runBlocking { settingRepository.getNetworkProtocol.first() }
 
-        var baseUrl: String
+        val serverAddress = serverAddressFromSettings.takeIf { it.isNotEmpty() } ?: "localhost"
+        val serverPort = serverPortFromSettings.takeIf { it.isNotEmpty() } ?: "3000"
+        val networkProtocol = networkProtocolFromSettings.takeIf { it.isNotEmpty() } ?: "http"
 
-        if (serverAddress.isNotEmpty() && serverPort.isEmpty()) {
-            baseUrl =
-                "${networkProtocol.takeIf { it.isNotEmpty() } ?: fallbackNetworkProtocol}://${serverAddress}/"
-        } else {
-            baseUrl =
-                "${networkProtocol.takeIf { it.isNotEmpty() } ?: fallbackNetworkProtocol}://${serverAddress.takeIf { it.isNotEmpty() } ?: fallbackAddress}:${serverPort.takeIf { it.isNotEmpty() } ?: fallbackPort}/"
-        }
+        val baseUrl = "${networkProtocol}://${NetworkUtils.getServerUrl(serverAddress, serverPort)}"
 
         // On veut pouvoir déserialiser les dates avec le format ISO_OFFSET_DATE_TIME pour simplifier la communication entre l'API et nestJs et le mobile
         val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
@@ -72,8 +66,12 @@ class NetworkModule {
     }
 
     @Provides
-    @Singleton
     fun provideTemperatureWebService(retrofit: Retrofit): TemperatureWebService {
         return retrofit.create(TemperatureWebService::class.java)
+    }
+
+    @Provides
+    fun provideAuthService(retrofit: Retrofit): AuthService {
+        return retrofit.create(AuthService::class.java)
     }
 }
