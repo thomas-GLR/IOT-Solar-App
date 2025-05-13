@@ -5,4 +5,5 @@ import javax.inject.Inject
 
 class TemperaturesRepository @Inject constructor(private val apiServiceProvider: ApiServiceProvider) {
     suspend fun getLastTemperatures() = apiServiceProvider.temperatureWebService.getLastTemperatures()
+    suspend fun getTemperatures() = apiServiceProvider.temperatureWebService.getTemperatures()
 }

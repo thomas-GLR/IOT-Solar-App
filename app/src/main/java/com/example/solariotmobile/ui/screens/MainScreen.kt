@@ -35,7 +35,7 @@ fun MainScreen(
     val items = listOf(
         NavDestination.Temperatures,
         // TODO réactiver la route quand le dev sera terminé
-        // NavDestination.Grid,
+         NavDestination.Grid,
         NavDestination.Command
     )
     var selectedIndex by remember { mutableIntStateOf(0) }

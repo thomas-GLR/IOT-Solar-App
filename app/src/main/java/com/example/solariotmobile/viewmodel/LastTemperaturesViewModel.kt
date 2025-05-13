@@ -21,6 +21,8 @@ class LastTemperaturesViewModel @Inject constructor(private val temperaturesRepo
     val getMessage: LiveData<String> get() = _message
     private val _lastTemperatures = MutableLiveData<List<TemperatureDto>>()
     val getLastTemperature: LiveData<List<TemperatureDto>> get() = _lastTemperatures
+    private val _temperatures = MutableLiveData<List<TemperatureDto>>()
+    val getTemperatures: LiveData<List<TemperatureDto>> get() = _temperatures
 
     fun fetchData() {
         _loading.value = true
@@ -35,6 +37,33 @@ class LastTemperaturesViewModel @Inject constructor(private val temperaturesRepo
 
                 if (response.isSuccessful) {
                     _lastTemperatures.value =
+                        if (response.body() == null) emptyList() else response.body()
+                } else {
+                    _failure.value = true
+                    _message.value = ErrorResponseFactory.createErrorMessage(response.code(), response.errorBody())
+                }
+            } catch (exception: Exception) {
+                _failure.value = true
+                _loading.value = false
+                _message.value = exception.message ?: "Erreur inconnue"
+            }
+        }
+    }
+
+    fun fetchTemperatures() {
+        _loading.value = true
+        _failure.value = false
+        _message.value = ""
+        _temperatures.value = mutableListOf()
+
+        viewModelScope.launch {
+            try {
+                val response = temperaturesRepository.getTemperatures()
+
+                _loading.value = false
+
+                if (response.isSuccessful) {
+                    _temperatures.value =
                         if (response.body() == null) emptyList() else response.body()
                 } else {
                     _failure.value = true

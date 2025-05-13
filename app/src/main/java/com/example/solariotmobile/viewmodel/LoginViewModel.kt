@@ -19,7 +19,7 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
 
-    fun login(username: String, password: String) {
+    fun login(username: String, password: String, stayConnected: Boolean) {
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
             try {
@@ -38,6 +38,10 @@ class LoginViewModel @Inject constructor(
                     val refreshToken = response.body()!!.refreshToken
 
                     settingsRepository.saveToken(token, refreshToken)
+
+                    if (stayConnected) {
+                        settingsRepository.saveCredentials(username, password)
+                    }
                 }
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error(e.message ?: "Erreur de connexion")

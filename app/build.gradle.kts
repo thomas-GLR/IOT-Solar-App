@@ -53,6 +53,10 @@ android {
 }
 
 dependencies {
+    // Chart
+    implementation(libs.ycharts)
+    implementation(libs.vico.compose.m3)
+
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
