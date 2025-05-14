@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import co.yml.charts.common.extensions.isNotNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -19,6 +20,8 @@ class SettingRepository @Inject constructor(
         val TOKEN_KEY = stringPreferencesKey("jwt_token")
         val REFRESH_TOKEN_KEY = stringPreferencesKey("jwt_refresh_token")
         val NETWORK_PROTOCOL = stringPreferencesKey("network_protocol")
+        val USERNAME = stringPreferencesKey("username")
+        val PASSWORD = stringPreferencesKey("password")
     }
 
     val getServerAddress: Flow<String> = dataStore.data
@@ -57,6 +60,21 @@ class SettingRepository @Inject constructor(
         }
     }
 
+    suspend fun getUsername(): String? {
+        return dataStore.data.map { prefs -> prefs[USERNAME] }.firstOrNull()
+    }
+
+    suspend fun getPassword(): String? {
+        return dataStore.data.map { prefs -> prefs[PASSWORD] }.firstOrNull()
+    }
+
+    suspend fun saveCredentials(username: String, password: String) {
+        dataStore.edit { prefs ->
+            prefs[USERNAME] = username
+            prefs[PASSWORD] = password
+        }
+    }
+
     suspend fun getToken(): String? {
         return dataStore.data.map { prefs -> prefs[TOKEN_KEY] }.firstOrNull()
     }
@@ -69,6 +87,13 @@ class SettingRepository @Inject constructor(
         dataStore.edit {
             it.remove(TOKEN_KEY)
             it.remove(REFRESH_TOKEN_KEY)
+        }
+    }
+
+    suspend fun clearCredentials() {
+        dataStore.edit {
+            it.remove(USERNAME)
+            it.remove(PASSWORD)
         }
     }
 }
