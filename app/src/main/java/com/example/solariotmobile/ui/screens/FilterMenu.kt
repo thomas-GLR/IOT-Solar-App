@@ -1,6 +1,5 @@
-package com.example.solariotmobile.ui.grid
+package com.example.solariotmobile.ui.screens
 
-import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,8 +21,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.solariotmobile.data.ReadingDeviceName
 import com.example.solariotmobile.ui.components.DateRangePickerModal
-import com.example.solariotmobile.ui.temperatures.ReadingDeviceName
+import com.example.solariotmobile.viewmodel.TemperaturesViewModel
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset

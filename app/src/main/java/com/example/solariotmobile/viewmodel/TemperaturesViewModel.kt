@@ -1,12 +1,12 @@
-package com.example.solariotmobile.ui.grid
+package com.example.solariotmobile.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.solariotmobile.ui.temperatures.ReadingDeviceName
-import com.example.solariotmobile.ui.temperatures.TemperatureDto
-import com.example.solariotmobile.ui.temperatures.TemperaturesRepository
+import com.example.solariotmobile.data.ReadingDeviceName
+import com.example.solariotmobile.data.TemperatureDto
+import com.example.solariotmobile.repository.TemperaturesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.Instant
