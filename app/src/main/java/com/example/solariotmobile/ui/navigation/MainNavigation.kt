@@ -27,7 +27,7 @@ fun MainNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = NavDestination.Temperatures.route
+        startDestination = NavDestination.Grid.route
     ) {
         composable(route = NavDestination.Temperatures.route) {
             TemperaturesScreen()

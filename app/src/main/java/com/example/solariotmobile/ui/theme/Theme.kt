@@ -9,19 +9,34 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = FirstGreenForGradient,
     secondary = SecondGreenForGradient,
-    tertiary = Yellow
+    tertiary = Yellow,
+    // Text colors for dark theme
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.Black,
+    onBackground = Color.White,
+    onSurface = Color.White,
+    // Background colors
+    background = Color(0xFF121212),
+    surface = Color(0xFF121212)
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = FirstGreenForGradient,
     secondary = SecondGreenForGradient,
-    tertiary = Yellow
-
+    tertiary = Yellow,
+    // Text colors for light theme
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.Black,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F)
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
@@ -46,7 +61,8 @@ fun SolarIOTMobileTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+//        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme
         else -> LightColorScheme
     }
 
