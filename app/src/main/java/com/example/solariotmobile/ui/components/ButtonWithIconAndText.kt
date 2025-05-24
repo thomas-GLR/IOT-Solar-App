@@ -1,12 +1,11 @@
 package com.example.solariotmobile.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -19,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 
 @Composable
 fun ButtonWithIconAndText(
@@ -29,15 +28,14 @@ fun ButtonWithIconAndText(
     iconContentDescription: String,
 ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Button(
             onClick = { onClickButton() },
-            modifier = Modifier
-                .size(width = 250.dp, height = 100.dp)
-                .padding(16.dp),
-            colors = ButtonDefaults.buttonColors(contentColor = Color(0xFF32CD32)),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = FirstGreenForGradient,
+                contentColor = Color.White
+            ),
             shape = RoundedCornerShape(20.dp)
         ) {
             Row(
@@ -48,13 +46,11 @@ fun ButtonWithIconAndText(
                     imageVector = icon,
                     contentDescription = iconContentDescription,
                     tint = Color.White,
-                    modifier = Modifier.size(36.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text,
                     color = Color.White,
-                    fontSize = 24.sp
                 )
             }
         }

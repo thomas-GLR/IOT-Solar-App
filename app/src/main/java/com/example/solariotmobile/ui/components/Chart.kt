@@ -76,12 +76,12 @@ fun Chart(
 
             TimeRange.HOURS -> {
                 Triple(
-                    DateTimeFormatter.ofPattern("dd/MM/yy HH"),
+                    DateTimeFormatter.ofPattern("dd/MM/yy HH:mm"),
                     transformTemperaturesDtoToChartTemperatures(
                         selectedTemperatures,
                         ChronoUnit.HOURS
                     ),
-                    100.dp
+                    125.dp
                 )
             }
 
