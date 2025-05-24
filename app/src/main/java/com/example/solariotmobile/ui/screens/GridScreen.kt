@@ -1,9 +1,14 @@
 package com.example.solariotmobile.ui.screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,8 +54,6 @@ fun GridScreen(viewModel: TemperaturesViewModel = hiltViewModel()) {
     if (failure) {
         FailureWithRefresh(message) { viewModel.fetchData() }
     } else {
-
-        // https://developer.android.com/develop/ui/compose/lists?hl=fr
 
         Column(modifier = Modifier.padding(25.dp)) {
             FilterMenu(viewModel)
