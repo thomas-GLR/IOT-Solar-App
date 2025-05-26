@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
@@ -20,6 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,26 +33,43 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import co.yml.charts.common.extensions.isNotNull
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDocked() {
+fun DatePickerDocked(
+    defaultDate: LocalDate? = null,
+    onDateSelected: (LocalDate) -> Unit
+) {
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-    val selectedDate = datePickerState.selectedDateMillis?.let {
+    val selectedDate = datePickerState.selectedDateMillis
+    val selectedDateString = datePickerState.selectedDateMillis?.let {
         convertMillisToDate(it)
-    } ?: ""
+    } ?: if (defaultDate == null) "" else convertMillisToDate(defaultDate.toEpochDay())
+
+    LaunchedEffect(datePickerState.selectedDateMillis) {
+        if (selectedDate.isNotNull()) {
+            val selectedLocalDateTime = Instant.ofEpochMilli(selectedDate!!)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+            onDateSelected(selectedLocalDateTime)
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = selectedDate,
+            value = selectedDateString,
             onValueChange = { },
-            label = { Text("DOB") },
+            label = { Text("Date") },
             readOnly = true,
             trailingIcon = {
                 IconButton(onClick = { showDatePicker = !showDatePicker }) {
@@ -61,8 +80,8 @@ fun DatePickerDocked() {
                 }
             },
             modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
+                .width(200.dp)
+                .height(40.dp)
         )
 
         if (showDatePicker) {

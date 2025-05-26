@@ -2,18 +2,12 @@ package com.example.solariotmobile.ui.screens.temperatureScreen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,7 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import androidx.wear.compose.material.Button
 import com.example.solariotmobile.data.ChartTemperature
 import com.example.solariotmobile.data.ReadingDeviceName
 import com.example.solariotmobile.data.TemperatureDto
@@ -36,7 +30,9 @@ import com.example.solariotmobile.ui.components.FailureComponentWithRefreshButto
 import com.example.solariotmobile.ui.components.LoadingComponent
 import com.example.solariotmobile.ui.components.ReadingDeviceButton
 import com.example.solariotmobile.ui.components.TimeRangeButton
+import java.time.LocalDate.now
 import java.time.LocalDateTime
+import java.time.Year
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
@@ -53,99 +49,103 @@ fun TemperaturesEvolution(
     val temperaturesByDevice = sortedTemperatures.groupBy { it.readingDeviceName }
 
     var selectedDevice by remember { mutableStateOf(ReadingDeviceName.TOP) }
-    var selectedTimeRange by remember { mutableStateOf(AggregationType.MINUTES) }
+    var selectedTimeRange by remember { mutableStateOf(AggregationType.DAYS) }
+    var selectedIndexForTemperatureRange by remember { mutableStateOf<Int?>(null) }
+    var selectedDate by remember { mutableStateOf(now()) }
+    var showDialogTimeSelector by remember { mutableStateOf(false) }
+
+    val hours = listOf(
+        "Minuit",
+        "1 heure",
+        "2 heures",
+        "3 heures",
+        "4 heures",
+        "5 heures",
+        "6 heures",
+        "7 heures",
+        "8 heures",
+        "9 heures",
+        "10 heures",
+        "11 heures",
+        "12 heures",
+        "13 heures",
+        "14 heures",
+        "15 heures",
+        "16 heures",
+        "17 heures",
+        "18 heures",
+        "19 heures",
+        "20 heures",
+        "21 heures",
+        "22 heures",
+        "23 heures"
+    )
+
+    val months = listOf(
+        "Janvier",
+        "Février",
+        "Mars",
+        "Avril",
+        "Mai",
+        "Juin",
+        "Juillet",
+        "Août",
+        "Septembre",
+        "Octobre",
+        "Novembre",
+        "Décembre",
+    )
+
+    // 2025 car l'application a été lancée en 2025
+    val years = getYearsFrom(2025)
 
     // Récupérer les données de température pour l'appareil sélectionné
     val selectedTemperatures = temperaturesByDevice[selectedDevice] ?: emptyList()
 
-    val (dateFormatter, filteredTemperatures, itemsSelector) = remember(
+    val (dateFormatter, filteredTemperatures) = remember(
         selectedTemperatures,
         selectedTimeRange
     ) {
         when (selectedTimeRange) {
             AggregationType.MINUTES -> {
-                Triple(
+                Pair(
                     DateTimeFormatter.ofPattern("HH:mm"),
                     selectedTemperatures.map {
                         ChartTemperature(
                             it.temperature,
                             it.collectionDate
                         )
-                    },
-                    listOf(
-                        "Minuit",
-                        "1 heure",
-                        "2 heures",
-                        "3 heures",
-                        "4 heures",
-                        "5 heures",
-                        "6 heures",
-                        "7 heures",
-                        "8 heures",
-                        "9 heures",
-                        "10 heures",
-                        "11 heures",
-                        "12 heures",
-                        "13 heures",
-                        "14 heures",
-                        "15 heures",
-                        "16 heures",
-                        "17 heures",
-                        "18 heures",
-                        "19 heures",
-                        "20 heures",
-                        "21 heures",
-                        "22 heures",
-                        "23 heures"
-                    )
+                    }
                 )
             }
 
             AggregationType.HOURS -> {
-                Triple(
+                Pair(
                     DateTimeFormatter.ofPattern("HH:mm"),
                     transformTemperaturesDtoToChartTemperatures(
                         selectedTemperatures,
                         ChronoUnit.HOURS
-                    ),
-                    listOf(
-                        ""
                     )
                 )
             }
 
             AggregationType.DAYS -> {
-                Triple(
+                Pair(
                     DateTimeFormatter.ofPattern("yy"),
                     transformTemperaturesDtoToChartTemperatures(
                         selectedTemperatures,
                         ChronoUnit.DAYS
-                    ),
-                    listOf(
-                        "Janvier",
-                        "Février",
-                        "Mars",
-                        "Avril",
-                        "Mai",
-                        "Juin",
-                        "Juillet",
-                        "Août",
-                        "Septembre",
-                        "Octobre",
-                        "Novembre",
-                        "Décembre",
                     )
                 )
             }
 
             AggregationType.MONTHS -> {
-                Triple(
+                Pair(
                     DateTimeFormatter.ofPattern("MM"),
                     transformTemperaturesDtoToChartTemperatures(
                         selectedTemperatures,
                         ChronoUnit.MONTHS
-                    ),
-                    75.dp
+                    )
                 )
             }
         }
@@ -183,8 +183,69 @@ fun TemperaturesEvolution(
                     selectedTimeRange = timeRangeSelected
                 }
             )
-            Box(modifier = Modifier.width(200.dp)) {
-                DatePickerDocked()
+
+            if (selectedTimeRange != AggregationType.MONTHS) {
+                DatePickerDocked(
+                    defaultDate = selectedDate,
+                    onDateSelected = { date -> selectedDate = date }
+                )
+            }
+
+            when(selectedTimeRange) {
+                AggregationType.MINUTES -> {
+                    Button(onClick = { showDialogTimeSelector = true }) {
+                        val moisSelectionne = if (selectedIndexForTemperatureRange == null) "Sélectionner une heure" else hours[selectedIndexForTemperatureRange!!]
+                        Text(moisSelectionne)
+                    }
+                    if (showDialogTimeSelector) {
+                        TimeSelectorDialog(
+                            title = "Selectionner une minute",
+                            onDismiss = { showDialogTimeSelector = false },
+                            options = hours,
+                            onConfirm = { selectedIndex ->
+                                selectedIndexForTemperatureRange = selectedIndex
+                                showDialogTimeSelector = false
+                            }
+                        )
+                    }
+                }
+                AggregationType.HOURS -> {
+                    // rien
+                }
+                AggregationType.DAYS -> {
+                    Button(onClick = { showDialogTimeSelector = true }) {
+                        val moisSelectionne = if (selectedIndexForTemperatureRange == null) "Sélectionner un mois" else months[selectedIndexForTemperatureRange!!]
+                        Text(moisSelectionne)
+                    }
+                    if (showDialogTimeSelector) {
+                        TimeSelectorDialog(
+                            title = "Selectionner un mois",
+                            onDismiss = { showDialogTimeSelector = false },
+                            options = months,
+                            onConfirm = { selectedIndex ->
+                                selectedIndexForTemperatureRange = selectedIndex
+                                showDialogTimeSelector = false
+                            }
+                        )
+                    }
+                }
+                AggregationType.MONTHS -> {
+                    Button(onClick = { showDialogTimeSelector = true }) {
+                        val moisSelectionne = if (selectedIndexForTemperatureRange == null) "Sélectionner une année" else years[selectedIndexForTemperatureRange!!]
+                        Text(moisSelectionne)
+                    }
+                    if (showDialogTimeSelector) {
+                        TimeSelectorDialog(
+                            title = "Selectionner une année",
+                            onDismiss = { showDialogTimeSelector = false },
+                            options = years,
+                            onConfirm = { selectedIndex ->
+                                selectedIndexForTemperatureRange = selectedIndex
+                                showDialogTimeSelector = false
+                            }
+                        )
+                    }
+                }
             }
         }
 
@@ -198,15 +259,24 @@ fun TemperaturesEvolution(
     }
 }
 
+private fun getYearsFrom(startYear: Int): List<String> {
+    val currentYear = Year.now().value
+    return (startYear..currentYear).map { year -> year.toString() }
+}
+
+@Composable
+fun buttonForDialog() {
+
+}
+
 @Composable
 fun TimeSelectorDialog(
     title: String,
     options: List<String>,
-    selectedIndex: Int,
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit
 ) {
-    var selected by remember { mutableIntStateOf(selectedIndex) }
+    var selected by remember { mutableIntStateOf(0) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
