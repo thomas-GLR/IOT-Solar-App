@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -91,15 +92,16 @@ fun DatePickerDocked(
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .offset(y = 64.dp)
+                        .fillMaxHeight(0.6f)
+                        .fillMaxWidth(0.6f)
+//                        .offset(y = 64.dp)
                         .shadow(elevation = 4.dp)
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(16.dp)
                 ) {
                     DatePicker(
                         state = datePickerState,
-                        showModeToggle = false
+                        showModeToggle = true
                     )
                 }
             }

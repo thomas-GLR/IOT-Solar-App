@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -50,54 +51,9 @@ fun TemperaturesEvolution(
 
     var selectedDevice by remember { mutableStateOf(ReadingDeviceName.TOP) }
     var selectedTimeRange by remember { mutableStateOf(AggregationType.DAYS) }
-    var selectedIndexForTemperatureRange by remember { mutableStateOf<Int?>(null) }
     var selectedDate by remember { mutableStateOf(now()) }
-    var showDialogTimeSelector by remember { mutableStateOf(false) }
-
-    val hours = listOf(
-        "Minuit",
-        "1 heure",
-        "2 heures",
-        "3 heures",
-        "4 heures",
-        "5 heures",
-        "6 heures",
-        "7 heures",
-        "8 heures",
-        "9 heures",
-        "10 heures",
-        "11 heures",
-        "12 heures",
-        "13 heures",
-        "14 heures",
-        "15 heures",
-        "16 heures",
-        "17 heures",
-        "18 heures",
-        "19 heures",
-        "20 heures",
-        "21 heures",
-        "22 heures",
-        "23 heures"
-    )
-
-    val months = listOf(
-        "Janvier",
-        "Février",
-        "Mars",
-        "Avril",
-        "Mai",
-        "Juin",
-        "Juillet",
-        "Août",
-        "Septembre",
-        "Octobre",
-        "Novembre",
-        "Décembre",
-    )
-
-    // 2025 car l'application a été lancée en 2025
-    val years = getYearsFrom(2025)
+    var firstDate  by remember { mutableStateOf<LocalDateTime?>(null) }
+    var endDate  by remember { mutableStateOf<LocalDateTime?>(null) }
 
     // Récupérer les données de température pour l'appareil sélectionné
     val selectedTemperatures = temperaturesByDevice[selectedDevice] ?: emptyList()
@@ -108,6 +64,8 @@ fun TemperaturesEvolution(
     ) {
         when (selectedTimeRange) {
             AggregationType.MINUTES -> {
+                firstDate = null
+                endDate = null
                 Pair(
                     DateTimeFormatter.ofPattern("HH:mm"),
                     selectedTemperatures.map {
@@ -120,6 +78,8 @@ fun TemperaturesEvolution(
             }
 
             AggregationType.HOURS -> {
+                firstDate = null
+                endDate = null
                 Pair(
                     DateTimeFormatter.ofPattern("HH:mm"),
                     transformTemperaturesDtoToChartTemperatures(
@@ -130,8 +90,10 @@ fun TemperaturesEvolution(
             }
 
             AggregationType.DAYS -> {
+                firstDate = null
+                endDate = null
                 Pair(
-                    DateTimeFormatter.ofPattern("yy"),
+                    DateTimeFormatter.ofPattern("dd"),
                     transformTemperaturesDtoToChartTemperatures(
                         selectedTemperatures,
                         ChronoUnit.DAYS
@@ -140,6 +102,8 @@ fun TemperaturesEvolution(
             }
 
             AggregationType.MONTHS -> {
+                firstDate = null
+                endDate = null
                 Pair(
                     DateTimeFormatter.ofPattern("MM"),
                     transformTemperaturesDtoToChartTemperatures(
@@ -187,64 +151,52 @@ fun TemperaturesEvolution(
             if (selectedTimeRange != AggregationType.MONTHS) {
                 DatePickerDocked(
                     defaultDate = selectedDate,
-                    onDateSelected = { date -> selectedDate = date }
+                    onDateSelected = { date ->
+                        if (selectedTimeRange == AggregationType.DAYS) {
+                            fetchData(selectedTimeRange, selectedDate.atStartOfDay(), selectedDate.atStartOfDay().plusDays(1))
+                        }
+                        selectedDate = date
+                    }
                 )
             }
 
             when(selectedTimeRange) {
                 AggregationType.MINUTES -> {
-                    Button(onClick = { showDialogTimeSelector = true }) {
-                        val moisSelectionne = if (selectedIndexForTemperatureRange == null) "Sélectionner une heure" else hours[selectedIndexForTemperatureRange!!]
-                        Text(moisSelectionne)
-                    }
-                    if (showDialogTimeSelector) {
-                        TimeSelectorDialog(
-                            title = "Selectionner une minute",
-                            onDismiss = { showDialogTimeSelector = false },
-                            options = hours,
-                            onConfirm = { selectedIndex ->
-                                selectedIndexForTemperatureRange = selectedIndex
-                                showDialogTimeSelector = false
-                            }
-                        )
-                    }
+                    buttonForDialog(
+                        aggregationType = selectedTimeRange,
+                        onSelectedOption = { value ->
+                            firstDate = selectedDate.atStartOfDay().plusHours(value.toLong())
+                            endDate = firstDate!!.plusHours(1)
+
+                            fetchData(selectedTimeRange, firstDate!!, endDate!!)
+                        }
+                    )
                 }
                 AggregationType.HOURS -> {
                     // rien
                 }
                 AggregationType.DAYS -> {
-                    Button(onClick = { showDialogTimeSelector = true }) {
-                        val moisSelectionne = if (selectedIndexForTemperatureRange == null) "Sélectionner un mois" else months[selectedIndexForTemperatureRange!!]
-                        Text(moisSelectionne)
-                    }
-                    if (showDialogTimeSelector) {
-                        TimeSelectorDialog(
-                            title = "Selectionner un mois",
-                            onDismiss = { showDialogTimeSelector = false },
-                            options = months,
-                            onConfirm = { selectedIndex ->
-                                selectedIndexForTemperatureRange = selectedIndex
-                                showDialogTimeSelector = false
-                            }
-                        )
-                    }
+                    buttonForDialog(
+                        aggregationType = selectedTimeRange,
+                        onSelectedOption = { value ->
+                            firstDate = selectedDate.atStartOfDay().plusMonths(value.toLong())
+                            endDate = firstDate!!.plusMonths(1)
+
+                            fetchData(selectedTimeRange, firstDate!!, endDate!!)
+                        }
+                    )
                 }
                 AggregationType.MONTHS -> {
-                    Button(onClick = { showDialogTimeSelector = true }) {
-                        val moisSelectionne = if (selectedIndexForTemperatureRange == null) "Sélectionner une année" else years[selectedIndexForTemperatureRange!!]
-                        Text(moisSelectionne)
-                    }
-                    if (showDialogTimeSelector) {
-                        TimeSelectorDialog(
-                            title = "Selectionner une année",
-                            onDismiss = { showDialogTimeSelector = false },
-                            options = years,
-                            onConfirm = { selectedIndex ->
-                                selectedIndexForTemperatureRange = selectedIndex
-                                showDialogTimeSelector = false
-                            }
-                        )
-                    }
+                    buttonForDialog(
+                        aggregationType = selectedTimeRange,
+                        onSelectedOption = { value ->
+                            val year = getYearsFrom(2025)[value].toInt()
+                            firstDate = LocalDateTime.of(year, 1, 1, 0, 0)
+                            endDate = firstDate!!.plusYears(1)
+
+                            fetchData(selectedTimeRange, firstDate!!, endDate!!)
+                        }
+                    )
                 }
             }
         }
@@ -265,8 +217,88 @@ private fun getYearsFrom(startYear: Int): List<String> {
 }
 
 @Composable
-fun buttonForDialog() {
+fun buttonForDialog(
+    aggregationType: AggregationType,
+    onSelectedOption: (index: Int) -> Unit
+) {
+    val hours = listOf(
+        "Minuit",
+        "1 heure",
+        "2 heures",
+        "3 heures",
+        "4 heures",
+        "5 heures",
+        "6 heures",
+        "7 heures",
+        "8 heures",
+        "9 heures",
+        "10 heures",
+        "11 heures",
+        "12 heures",
+        "13 heures",
+        "14 heures",
+        "15 heures",
+        "16 heures",
+        "17 heures",
+        "18 heures",
+        "19 heures",
+        "20 heures",
+        "21 heures",
+        "22 heures",
+        "23 heures"
+    )
 
+    val months = listOf(
+        "Janvier",
+        "Février",
+        "Mars",
+        "Avril",
+        "Mai",
+        "Juin",
+        "Juillet",
+        "Août",
+        "Septembre",
+        "Octobre",
+        "Novembre",
+        "Décembre",
+    )
+
+    // 2025 car l'application a été lancée en 2025
+    val years = getYearsFrom(2025)
+
+    val (options, defaultText) = when(aggregationType) {
+        AggregationType.MINUTES -> Pair(hours, "Sélectionner une heure")
+        // On est pas censé avoir hours pas de sélecteur pour ce dernier
+        AggregationType.HOURS -> Pair(emptyList(), "Sélectionner une heure")
+        AggregationType.DAYS -> Pair(months, "Sélectionner un mois")
+        AggregationType.MONTHS -> Pair(years, "Sélectionner une année")
+    }
+
+    var showDialogTimeSelector by remember { mutableStateOf(false) }
+    var textToShow by remember { mutableStateOf(defaultText) }
+
+    OutlinedTextField(
+        value = textToShow,
+        onValueChange = {},
+        enabled = false,
+        modifier = Modifier
+            .clickable { showDialogTimeSelector = true }
+    )
+//    Button(onClick = { showDialogTimeSelector = true }) {
+//        Text(textToShow)
+//    }
+    if (showDialogTimeSelector) {
+        TimeSelectorDialog(
+            title = defaultText,
+            onDismiss = { showDialogTimeSelector = false },
+            options = options,
+            onConfirm = { selectedIndex ->
+                showDialogTimeSelector = false
+                textToShow = options[selectedIndex]
+                onSelectedOption(selectedIndex)
+            }
+        )
+    }
 }
 
 @Composable
