@@ -26,7 +26,6 @@ fun ReadingDeviceButton(
     selectBottomDevice: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         var selectedIndex by remember { mutableIntStateOf(0) }

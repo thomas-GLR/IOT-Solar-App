@@ -2,7 +2,6 @@ package com.example.solariotmobile.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -13,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.solariotmobile.data.AggregationType
@@ -24,15 +22,15 @@ fun TimeRangeButton(
     selectTimeRange: (timeRangeSelected: AggregationType) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+//        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        var selectedIndex by remember { mutableIntStateOf(0) }
+        var selectedIndex by remember { mutableIntStateOf(2) }
         val options = listOf(
-            AggregationType.MINUTES,
             AggregationType.HOURS,
             AggregationType.DAYS,
             AggregationType.MONTHS,
+            AggregationType.YEARS,
         )
 
         val cornerRadius = 8.dp

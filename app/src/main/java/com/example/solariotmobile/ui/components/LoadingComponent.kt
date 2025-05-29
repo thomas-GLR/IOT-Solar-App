@@ -1,7 +1,9 @@
 package com.example.solariotmobile.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -14,7 +16,7 @@ import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 
 @Composable
 fun LoadingComponent(indicatorSize: Dp = 64.dp) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = Modifier.fillMaxWidth().height(indicatorSize + 10.dp)) {
         CircularProgressIndicator(
             modifier = Modifier
                 .width(indicatorSize)

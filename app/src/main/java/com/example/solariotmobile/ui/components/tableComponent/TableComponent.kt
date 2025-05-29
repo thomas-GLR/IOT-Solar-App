@@ -84,7 +84,7 @@ fun TableComponent(
                                 CellComponent(
                                     temperature.collectionDate.format(
                                         DateTimeFormatter.ofPattern(
-                                            "dd/MM/yyyy - HH:mm"
+                                            "dd/MM/yyyy - HH:mm:ss"
                                         )
                                     ), modifier, height
                                 )

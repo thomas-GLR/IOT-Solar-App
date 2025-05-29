@@ -23,11 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.solariotmobile.data.AggregationType
 import com.example.solariotmobile.data.ReadingDeviceName
 import com.example.solariotmobile.data.TemperatureDto
-import com.example.solariotmobile.data.AggregationType
 import com.example.solariotmobile.viewmodel.LastTemperaturesViewModel
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -44,11 +43,6 @@ fun TemperaturesScreen(viewModel: LastTemperaturesViewModel = hiltViewModel()) {
 
     LaunchedEffect(Unit) {
         viewModel.fetchLastTemperatures()
-        viewModel.fetchTemperatures(
-            AggregationType.MINUTES,
-            LocalDate.now().atStartOfDay(),
-            LocalDate.now().atStartOfDay().plusHours(1)
-        )
     }
 
     val scrollState = rememberScrollState()
