@@ -26,7 +26,6 @@ fun ReadingDeviceButton(
     selectBottomDevice: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         var selectedIndex by remember { mutableIntStateOf(0) }
@@ -69,10 +68,12 @@ fun ReadingDeviceButton(
                     },
                     selected = index == selectedIndex,
                     colors = SegmentedButtonDefaults.colors(
-                        activeContainerColor = FirstGreenForGradient.copy(alpha = 0.8f),
-                        activeContentColor = Color.Black,
+                        activeContainerColor = FirstGreenForGradient,
+                        activeContentColor = Color.White,
                         inactiveContainerColor = Color.Transparent,
-                        inactiveContentColor = Color.Black
+                        inactiveContentColor = Color.Black,
+                        activeBorderColor = Color.LightGray,
+                        inactiveBorderColor = Color.LightGray,
                     ),
                 ) {
                     Text(device.value)

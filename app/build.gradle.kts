@@ -83,7 +83,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.graphics.shapes.android)
-    implementation(libs.androidx.compose.material)
+//    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.material3.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

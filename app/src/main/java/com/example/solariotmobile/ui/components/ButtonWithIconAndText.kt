@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 
@@ -26,9 +27,12 @@ fun ButtonWithIconAndText(
     text: String,
     icon: ImageVector,
     iconContentDescription: String,
+    modifier: Modifier = Modifier,
+    roundedCornerShapeSize: Dp = 20.dp
 ) {
     Box(
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+        modifier = modifier
     ) {
         Button(
             onClick = { onClickButton() },
@@ -36,7 +40,7 @@ fun ButtonWithIconAndText(
                 containerColor = FirstGreenForGradient,
                 contentColor = Color.White
             ),
-            shape = RoundedCornerShape(20.dp)
+            shape = RoundedCornerShape(roundedCornerShapeSize)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
