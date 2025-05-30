@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,12 +25,13 @@ import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 import com.example.solariotmobile.utils.NumberUtils.numberToFranceFormat
 import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun TableComponent(
     temperatures: List<TemperatureDto>,
     isLoading: Boolean,
+    headers: List<String>,
+    contentRow: @Composable ((temperature: TemperatureDto) -> Unit)
 ) {
     Column(
         Modifier
@@ -42,7 +42,7 @@ fun TableComponent(
         verticalArrangement = Arrangement.Center
     ) {
         HeadersComponent(
-            listOf("Température", "Date", "Sonde"),
+            headers,
             Modifier.align(Alignment.Start)
         )
 
@@ -73,27 +73,7 @@ fun TableComponent(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                val modifier = Modifier.weight(2f)
-                                val height = 40.dp
-
-                                CellComponent("${temperature.temperature}", modifier, height)
-                                CellComponent(
-                                    temperature.collectionDate.format(
-                                        DateTimeFormatter.ofPattern(
-                                            "dd/MM/yyyy - HH:mm:ss"
-                                        )
-                                    ), modifier, height
-                                )
-                                CellComponent(
-                                    temperature.readingDeviceName.value,
-                                    modifier,
-                                    height
-                                )
-                            }
+                            contentRow(temperature)
                             HorizontalDivider(
                                 color = Color.LightGray,
                                 modifier = Modifier.fillMaxWidth(0.9f),

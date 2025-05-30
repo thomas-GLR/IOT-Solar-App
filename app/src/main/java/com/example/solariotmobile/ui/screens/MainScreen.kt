@@ -3,6 +3,7 @@ package com.example.solariotmobile.ui.screens
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,16 +15,20 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import co.yml.charts.common.extensions.isNotNull
 import com.example.solariotmobile.ui.navigation.MainNavigation
-import com.example.solariotmobile.ui.navigation.NavDestination
+import com.example.solariotmobile.ui.navigation.MainNavDestination
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,11 +38,21 @@ fun MainScreen(
 ) {
     val navController = rememberNavController()
     val items = listOf(
-        NavDestination.Temperatures,
-        NavDestination.Grid,
-        NavDestination.Command
+        MainNavDestination.Temperatures,
+        MainNavDestination.Grid,
+        MainNavDestination.Command
     )
     var selectedIndex by remember { mutableIntStateOf(0) }
+    var showBackButton by remember { mutableStateOf(false) }
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val currentRoute = currentDestination?.route
+
+    LaunchedEffect(currentRoute) {
+        showBackButton =
+            currentRoute.isNotNull() && currentRoute == MainNavDestination.GridDetail.route
+    }
 
     Scaffold(
         topBar = {
@@ -49,6 +64,13 @@ fun MainScreen(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
                             contentDescription = "Se déconnecter"
                         )
+                    }
+                },
+                navigationIcon = {
+                    if (showBackButton) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 }
             )

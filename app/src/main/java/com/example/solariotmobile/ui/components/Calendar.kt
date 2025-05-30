@@ -112,7 +112,7 @@ fun DatePickerDocked(
                 )
                 Icon(
                     imageVector = Icons.Default.DateRange,
-                    contentDescription = "Select date"
+                    contentDescription = "Calendrier"
                 )
             }
         }
