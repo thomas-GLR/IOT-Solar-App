@@ -34,7 +34,7 @@ class LoginViewModel @Inject constructor(
                 }
 
                 if (_loginState.value == LoginState.Success && response.body() != null) {
-                    val token = response.body()!!.accessToken
+                    val token = response.body()!!.token
                     val refreshToken = response.body()!!.refreshToken
 
                     settingsRepository.saveToken(token, refreshToken)

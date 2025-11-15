@@ -19,9 +19,9 @@ class TokenAuthenticator @Inject constructor(
             val tokenResponse = refreshToken?.let { authService.get().refreshToken(it).body() }
 
             if (tokenResponse != null) {
-                settingRepository.saveToken(tokenResponse.accessToken, tokenResponse.refreshToken)
+                settingRepository.saveToken(tokenResponse.token, tokenResponse.refreshToken)
                 response.request().newBuilder()
-                    .header("Authorization", "Bearer ${tokenResponse.accessToken}")
+                    .header("Authorization", "Bearer ${tokenResponse.token}")
                     .build()
             } else {
                 null

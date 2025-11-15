@@ -21,7 +21,7 @@ class SplashScreenViewModel @Inject constructor(
             val response = authRepository.login(username, password)
 
             if (response.code() == 200 && response.body() != null) {
-                val token = response.body()!!.accessToken
+                val token = response.body()!!.token
                 val refreshToken = response.body()!!.refreshToken
 
                 settingRepository.saveToken(token, refreshToken)

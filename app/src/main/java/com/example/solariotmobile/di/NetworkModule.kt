@@ -5,6 +5,7 @@ import com.example.solariotmobile.domain.AuthService
 import com.example.solariotmobile.domain.TemperatureWebService
 import com.example.solariotmobile.domain.TokenAuthenticator
 import com.example.solariotmobile.repository.SettingRepository
+import com.example.solariotmobile.utils.LocalDateTimeAdapter
 import com.example.solariotmobile.utils.NetworkUtils
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
@@ -51,11 +52,15 @@ class NetworkModule {
         val baseUrl = "${networkProtocol}://${NetworkUtils.getServerUrl(serverAddress, serverPort)}"
 
         // On veut pouvoir déserialiser les dates avec le format ISO_OFFSET_DATE_TIME pour simplifier la communication entre l'API et nestJs et le mobile
-        val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
-            LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        }
+//        val localDateTimeDeserializer = JsonDeserializer { json, _, _ ->
+//            LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+//        }
+//        val gson = GsonBuilder()
+//            .registerTypeAdapter(LocalDateTime::class.java, localDateTimeDeserializer)
+//            .create()
+
         val gson = GsonBuilder()
-            .registerTypeAdapter(LocalDateTime::class.java, localDateTimeDeserializer)
+            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
             .create()
 
         return Retrofit.Builder()
