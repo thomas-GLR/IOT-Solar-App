@@ -1,29 +1,26 @@
 package com.example.solariotmobile.ui.screens
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -37,13 +34,11 @@ import androidx.compose.ui.unit.dp
 import com.example.solariotmobile.data.ReadingDeviceName
 import com.example.solariotmobile.ui.components.ButtonWithIconAndText
 import com.example.solariotmobile.ui.components.DateRangePickerModal
+import com.example.solariotmobile.ui.components.convertDateToString
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
-import com.example.solariotmobile.ui.theme.PaleGreen
-import com.example.solariotmobile.ui.theme.SecondGreenForGradient
 import com.example.solariotmobile.viewmodel.TemperaturesViewModel
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.Month
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -63,7 +58,6 @@ enum class MonthFilter(val value: String) {
     DECEMBER("Décembre")
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FilterMenu(
     viewModel: TemperaturesViewModel
@@ -110,7 +104,7 @@ fun FilterMenu(
         DateRangePickerModal(
             onDateRangeSelected = {
                 selectedDateRange.value = it
-                viewModel.filterCollectionDateOfTemperatures(selectedDateRange.value)
+                viewModel.updateAndFilterTemperatures(selectedReadingDeviceName, selectedDateRange.value)
                 showRangeModal = false
             },
             onDismiss = { showRangeModal = false }
@@ -124,27 +118,69 @@ fun FilterMenu(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        ButtonWithIconAndText(
-            onClickButton = { showRangeModal = !showRangeModal },
-            text = datesRangeInformation,
-            icon = Icons.Filled.DateRange,
-            iconContentDescription = "Calendrier",
-        )
+        Button(
+            onClick = { showRangeModal = !showRangeModal },
+            modifier = Modifier
+                .width(325.dp),
+            colors = buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.Black
+            ),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, Color.LightGray)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(IntrinsicSize.Min)
+            ) {
+                Text(datesRangeInformation)
+                VerticalDivider(
+                    color = Color.LightGray,
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(horizontal = 25.dp)
+                )
+                Icon(
+                    imageVector = Icons.Filled.DateRange,
+                    contentDescription = "Calendrier"
+                )
+            }
+        }
+
+        val cornerRadius = 8.dp
+
         MultiChoiceSegmentedButtonRow {
             readingDevices.forEachIndexed { index, readingDeviceKey ->
+                val shape = when (index) {
+                    0 -> RoundedCornerShape(
+                        topStart = cornerRadius,
+                        bottomStart = cornerRadius,
+                        topEnd = 0.dp,
+                        bottomEnd = 0.dp
+                    )
+                    readingDevices.lastIndex -> RoundedCornerShape(
+                        topStart = 0.dp,
+                        bottomStart = 0.dp,
+                        topEnd = cornerRadius,
+                        bottomEnd = cornerRadius
+                    )
+                    else -> RoundedCornerShape(0.dp)
+                }
+
                 SegmentedButton(
                     icon = {},
-                    shape = SegmentedButtonDefaults.itemShape(
-                        index = index,
-                        count = readingDevices.size
-                    ),
+                    shape = shape,
+//                    shape = SegmentedButtonDefaults.itemShape(
+//                        index = index,
+//                        count = readingDevices.size
+//                    ),
                     onCheckedChange = {
                         if (readingDeviceKey in selectedReadingDeviceName) {
                             selectedReadingDeviceName.remove(readingDeviceKey)
-                            viewModel.filterReadingDevices(selectedReadingDeviceName)
+                            viewModel.updateAndFilterTemperatures(selectedReadingDeviceName, selectedDateRange.value)
                         } else {
                             selectedReadingDeviceName.add(readingDeviceKey)
-                            viewModel.filterReadingDevices(selectedReadingDeviceName)
+                            viewModel.updateAndFilterTemperatures(selectedReadingDeviceName, selectedDateRange.value)
                         }
                     },
                     checked = readingDeviceKey in selectedReadingDeviceName,
@@ -176,80 +212,7 @@ fun FilterMenu(
             text = "Réinitialiser les filtres",
             icon = Icons.Filled.Restore,
             iconContentDescription = "reset",
+            roundedCornerShapeSize = cornerRadius
         )
     }
-//    Column(
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.Center
-//        ) {
-//            Text(datesRangeInformation)
-//            IconButton(onClick = { showRangeModal = !showRangeModal }) {
-//                Icon(
-//                    imageVector = Icons.Filled.DateRange,
-//                    contentDescription = "Favorite"
-//                )
-//            }
-//            if (showRangeModal) {
-//                DateRangePickerModal(
-//                    onDateRangeSelected = {
-//                        selectedDateRange.value = it
-//                        viewModel.filterCollectionDateOfTemperatures(selectedDateRange.value)
-//                        showRangeModal = false
-//                    },
-//                    onDismiss = { showRangeModal = false }
-//                )
-//            }
-//        }
-//        MultiChoiceSegmentedButtonRow {
-//            readingDevices.forEachIndexed { index, readingDeviceKey ->
-//                SegmentedButton(
-//                    icon = {},
-//                    shape = SegmentedButtonDefaults.itemShape(
-//                        index = index,
-//                        count = readingDevices.size
-//                    ),
-//                    onCheckedChange = {
-//                        if (readingDeviceKey in selectedReadingDeviceName) {
-//                            selectedReadingDeviceName.remove(readingDeviceKey)
-//                            viewModel.filterReadingDevices(selectedReadingDeviceName)
-//                        } else {
-//                            selectedReadingDeviceName.add(readingDeviceKey)
-//                            viewModel.filterReadingDevices(selectedReadingDeviceName)
-//                        }
-//                    },
-//                    checked = readingDeviceKey in selectedReadingDeviceName,
-//                    colors = SegmentedButtonDefaults.colors(
-//                        activeContainerColor = FirstGreenForGradient,
-//                        activeContentColor = Color.Black,
-//                        inactiveContainerColor = Color.Transparent,
-//                        inactiveContentColor = Color.Black,
-//                    ),
-//                ) {
-//                    Text(
-//                        text = if (readingDeviceByName.containsKey(readingDeviceKey))
-//                            readingDeviceByName[readingDeviceKey]!!
-//                        else "Le label : $readingDeviceKey n'existe pas"
-//                    )
-//                }
-//            }
-//        }
-//        ButtonWithIconAndText(
-//            onClickButton = {
-//                viewModel.resetFilters()
-//                selectedDateRange.value = null to null
-//
-//                selectedReadingDeviceName.clear()
-//                selectedReadingDeviceName.addAll(readingDevices)
-//            },
-//            text = "Réinitialiser les filtres",
-//            icon = Icons.Filled.Restore,
-//            iconContentDescription = "reset",
-//        )
-//    }
-
 }
