@@ -20,7 +20,7 @@ class TokenAuthenticator @Inject constructor(
 
             if (tokenResponse != null) {
                 settingRepository.saveToken(tokenResponse.token, tokenResponse.refreshToken)
-                response.request().newBuilder()
+                response.request.newBuilder()
                     .header("Authorization", "Bearer ${tokenResponse.token}")
                     .build()
             } else {
