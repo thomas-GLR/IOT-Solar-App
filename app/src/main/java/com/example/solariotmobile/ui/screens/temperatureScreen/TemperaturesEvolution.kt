@@ -194,7 +194,7 @@ fun TemperaturesEvolution(
             }
 
             if (selectedTimeRange in listOf(
-                    AggregationType.HOURS,
+//                    AggregationType.HOURS,
                     AggregationType.MONTHS,
                     AggregationType.YEARS
                 )
