@@ -27,7 +27,7 @@ fun TimeRangeButton(
     ) {
         var selectedIndex by remember { mutableIntStateOf(2) }
         val options = listOf(
-            AggregationType.HOURS,
+//            AggregationType.HOURS,
             AggregationType.DAYS,
             AggregationType.MONTHS,
             AggregationType.YEARS,
