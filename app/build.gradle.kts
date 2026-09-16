@@ -47,6 +47,14 @@ android {
     }
     packaging {
         resources {
+            // This line fixes the problem of duplicates with (okhttp-sse and jspecify)
+            excludes += "/META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+
+            // It is often helpful to exclude other common metadata duplicates
+            // if you run into similar errors in the future:
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
+
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
@@ -70,6 +78,10 @@ dependencies {
 
     // LazyColumn
     implementation(libs.nanihadesuka.lazycolumnscrollbar)
+
+    // SSE
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.sse)
 
     implementation(libs.converter.scalars)
     implementation(libs.androidx.datastore.preferences)

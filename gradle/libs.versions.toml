@@ -16,6 +16,8 @@ activityCompose = "1.9.0"
 composeBom = "2025.04.01"
 lifecycleViewmodelCompose = "2.8.7"
 materialIconsExtended = "1.7.8"
+okhttp = "5.3.2"
+okhttpSse = "5.3.2"
 retrofit = "2.11.0"
 graphicsShapesAndroid = "1.0.0"
 composeMaterial = "1.4.0"
@@ -47,6 +49,8 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 nanihadesuka-lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "lazycolumnscrollbarVersion" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-sse = { module = "com.squareup.okhttp3:okhttp-sse", version.ref = "okhttpSse" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-graphics-shapes-android = { group = "androidx.graphics", name = "graphics-shapes-android", version.ref = "graphicsShapesAndroid" }
 #androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }

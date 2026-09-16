@@ -1,6 +1,7 @@
 package com.example.solariotmobile.domain
 
 import com.example.solariotmobile.data.AggregationType
+import com.example.solariotmobile.data.CreateResistanceStateDto
 import com.example.solariotmobile.data.EspParameterDto
 import com.example.solariotmobile.data.EspParameters
 import com.example.solariotmobile.data.LoginDto
@@ -45,7 +46,7 @@ interface TemperatureWebService {
     suspend fun getResistancesStates(): Response<List<ResistanceStateDto>>
 
     @POST("resistance")
-    suspend fun createResistanceState(@Body resistanceStateDto: ResistanceStateDto): Response<ResistanceStateDto>
+    suspend fun createResistanceState(@Body createResistanceStateDto: CreateResistanceStateDto): Response<ResistanceStateDto>
 
     @GET("parameter/esp")
     suspend fun getEspParameters(): Response<EspParameterDto>

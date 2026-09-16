@@ -37,20 +37,25 @@ fun Chart(
     xAxisStepSize: Dp,
     dateFormatter: DateTimeFormatter
 ) {
-    // Convertir les données pour YChart (en points x,y)
-    val points = temperatures.mapIndexed { index, temp ->
-        Point(
-            x = index.toFloat(),
-            y = temp.temperature.toFloat()
-        )
-    }
-
     // Déterminer min et max pour les axes
     val minTemp = temperatures.minByOrNull { it.temperature }?.temperature?.toFloat() ?: 0f
     val maxTemp =
         temperatures.maxByOrNull { it.temperature }?.temperature?.toFloat() ?: 180f
+
+    val ySteps = 5
+    val yMin = minTemp
+    val yMax = maxTemp + (maxTemp - minTemp) * 0.1f
+
+    // Convertir les données pour YChart (en points x,y)
+    val points = temperatures.mapIndexed { index, temp ->
+        Point(
+            x = index.toFloat(),
+            y = ((temp.temperature.toFloat() - yMin) / (yMax - yMin)) * ySteps
+        )
+    }
+
     val tempRange = ((maxTemp - minTemp) * 1.1f) // Ajouter 10% de marge
-    val yMax = maxTemp + tempRange * 0.05f
+//    val yMax = maxTemp + tempRange * 0.05f
 
     // Formatteur de date pour l'axe X
     val hoursFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -73,14 +78,13 @@ fun Chart(
 
     // Configuration de l'axe Y
     val yAxisData = AxisData.Builder()
-        .steps(5)
+        .steps(ySteps)
         .labelData { i ->
-            val step = ((yMax - 0) / 5).toInt()
-            val value = 0 + i * step
-            "$value°C"
+            val realValue = yMin + (i.toFloat() / ySteps) * (yMax - yMin)
+            "%.0f°C".format(realValue)
         }
         .labelAndAxisLinePadding(25.dp)
-        .shouldDrawAxisLineTillEnd(true)
+//        .shouldDrawAxisLineTillEnd(true)
         .build()
 
     // Configuration des lignes du graphique
