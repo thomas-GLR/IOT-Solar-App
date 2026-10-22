@@ -30,6 +30,8 @@ import com.example.solariotmobile.data.ChartTemperature
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 import com.example.solariotmobile.ui.theme.SecondGreenForGradient
 import java.time.format.DateTimeFormatter
+import kotlin.math.ceil
+import kotlin.math.floor
 
 @Composable
 fun Chart(
@@ -42,28 +44,47 @@ fun Chart(
     val maxTemp =
         temperatures.maxByOrNull { it.temperature }?.temperature?.toFloat() ?: 180f
 
-    val ySteps = 5
-    val yMin = minTemp
-    val yMax = maxTemp + (maxTemp - minTemp) * 0.1f
+    val yLabelCount = 6
+    val ySteps = yLabelCount - 1
+
+    var yMin = floor(minTemp).toInt()
+    var yMax = ceil(maxTemp).toInt()
+
+    val range = yMax - yMin
+    val targetRange = (maxOf(range, ySteps) + ySteps - 1) / ySteps * ySteps
+    val extra = targetRange - range
+
+    if (extra > 0) {
+        // Try to center the data ; the extra odd unit goes to the top.
+        val wantedBelow = extra / 2
+        val newYMin = (yMin - wantedBelow).coerceAtLeast(0)   // yMin >= 0
+        val addedBelow = yMin - newYMin
+
+        yMin = newYMin
+        yMax += extra - addedBelow
+    }
 
     // Convertir les données pour YChart (en points x,y)
     val points = temperatures.mapIndexed { index, temp ->
-        Point(
-            x = index.toFloat(),
-            y = ((temp.temperature.toFloat() - yMin) / (yMax - yMin)) * ySteps
-        )
+        Point(x = index.toFloat(), y = temp.temperature.toFloat())
     }
 
-    val tempRange = ((maxTemp - minTemp) * 1.1f) // Ajouter 10% de marge
-//    val yMax = maxTemp + tempRange * 0.05f
-
-    // Formatteur de date pour l'axe X
-    val hoursFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    val scaleLine = Line(
+        dataPoints = listOf(
+            Point(0f, yMin.toFloat()),
+            Point(0f, yMax.toFloat())
+        ),
+        lineStyle = LineStyle(color = Color.Transparent, width = 0f),
+        intersectionPoint = null,
+        selectionHighlightPoint = null,
+        shadowUnderLine = null,
+        selectionHighlightPopUp = null
+    )
 
     // Configuration de l'axe X
     val xAxisData = AxisData.Builder()
         .axisStepSize(xAxisStepSize)
-        .steps(temperatures.size - 1)
+        .steps(temperatures.size)
         .labelData { i ->
             if (i < temperatures.size) {
                 temperatures[i].dateTime.format(dateFormatter)
@@ -80,8 +101,8 @@ fun Chart(
     val yAxisData = AxisData.Builder()
         .steps(ySteps)
         .labelData { i ->
-            val realValue = yMin + (i.toFloat() / ySteps) * (yMax - yMin)
-            "%.0f°C".format(realValue)
+            val realValue = yMin + i * (yMax - yMin) / ySteps
+            "$realValue°C"
         }
         .labelAndAxisLinePadding(25.dp)
 //        .shouldDrawAxisLineTillEnd(true)
@@ -117,13 +138,14 @@ fun Chart(
                             val index = x.toInt()
                             if (index < temperatures.size) {
                                 val temp = temperatures[index]
-                                "${temp.temperature}°C"
+                                "%.2f°C".format(temp.temperature)
                             } else {
                                 ""
                             }
                         }
                     )
-                )
+                ),
+                scaleLine
             )
         ),
         xAxisData = xAxisData,
