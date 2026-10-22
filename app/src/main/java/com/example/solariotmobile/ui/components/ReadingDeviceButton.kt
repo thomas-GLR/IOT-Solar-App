@@ -30,9 +30,10 @@ fun ReadingDeviceButton(
     ) {
         var selectedIndex by remember { mutableIntStateOf(0) }
         val options = listOf(
-            ReadingDeviceName.TOP,
+            ReadingDeviceName.BOTTOM,
             ReadingDeviceName.MIDDLE,
-            ReadingDeviceName.BOTTOM)
+            ReadingDeviceName.TOP,
+        )
 
         val cornerRadius = 8.dp
 

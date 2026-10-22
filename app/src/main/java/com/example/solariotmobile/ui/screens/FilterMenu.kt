@@ -22,8 +22,8 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.example.solariotmobile.data.ReadingDeviceName
 import com.example.solariotmobile.ui.components.ButtonWithIconAndText
 import com.example.solariotmobile.ui.components.DateRangePickerModal
-import com.example.solariotmobile.ui.components.convertDateToString
 import com.example.solariotmobile.ui.theme.FirstGreenForGradient
 import com.example.solariotmobile.viewmodel.TemperaturesViewModel
 import java.time.Instant
@@ -42,58 +41,29 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-enum class MonthFilter(val value: String) {
-    ALL("Tous les mois"),
-    JANUARY("Janvier"),
-    FEBRUARY("Février"),
-    MARCH("Mars"),
-    APRIL("Avril"),
-    MAY("Mai"),
-    JUNE("Juin"),
-    JULY("Juillet"),
-    AUGUST("Aout"),
-    SEPTEMBER("Septembre"),
-    OCTOBER("Octobre"),
-    NOVEMBER("Novembre"),
-    DECEMBER("Décembre")
-}
-
 @Composable
 fun FilterMenu(
     viewModel: TemperaturesViewModel
 ) {
-    val readingDeviceByName = mapOf(
-        ReadingDeviceName.TOP to "Haut",
-        ReadingDeviceName.MIDDLE to "Milieu",
-        ReadingDeviceName.BOTTOM to "Bas"
-    )
+    val readingDevices = ReadingDeviceName.entries.toList()
 
-    val readingDevices = readingDeviceByName.keys.toList()
-
-    val selectedReadingDeviceName = remember { mutableStateListOf<ReadingDeviceName>() }
-    selectedReadingDeviceName.addAll(readingDevices)
-
-    val selectedMonth = remember { mutableStateListOf<MonthFilter>() }
-    selectedMonth.addAll(MonthFilter.entries)
-
-    val selectedDateRange = remember {
-        mutableStateOf<Pair<Long?, Long?>>(null to null)
-    }
+    val selectedReadingDeviceName by viewModel.getSelectedReadingDeviceNames.collectAsState()
+    val selectedDateRange by viewModel.getSelectedDateRange.collectAsState()
 
     var showRangeModal by remember { mutableStateOf(false) }
 
     val datesRangeInformation =
-        if (selectedDateRange.value != null to null && selectedDateRange.value.first != null && selectedDateRange.value.second != null)
+        if (selectedDateRange != null to null && selectedDateRange.first != null && selectedDateRange.second != null)
             "${
                 LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(selectedDateRange.value.first!!),
+                    Instant.ofEpochMilli(selectedDateRange.first!!),
                     ZoneOffset.UTC
                 ).toLocalDate().format(
                     DateTimeFormatter.ofPattern("dd / MM / yyyy")
                 )
             } - ${
                 LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(selectedDateRange.value.second!!),
+                    Instant.ofEpochMilli(selectedDateRange.second!!),
                     ZoneOffset.UTC
                 ).toLocalDate().format(
                     DateTimeFormatter.ofPattern("dd / MM / yyyy")
@@ -103,8 +73,7 @@ fun FilterMenu(
     if (showRangeModal) {
         DateRangePickerModal(
             onDateRangeSelected = {
-                selectedDateRange.value = it
-                viewModel.updateAndFilterTemperatures(selectedReadingDeviceName, selectedDateRange.value)
+                viewModel.toggleDateRange(it)
                 showRangeModal = false
             },
             onDismiss = { showRangeModal = false }
@@ -175,13 +144,7 @@ fun FilterMenu(
 //                        count = readingDevices.size
 //                    ),
                     onCheckedChange = {
-                        if (readingDeviceKey in selectedReadingDeviceName) {
-                            selectedReadingDeviceName.remove(readingDeviceKey)
-                            viewModel.updateAndFilterTemperatures(selectedReadingDeviceName, selectedDateRange.value)
-                        } else {
-                            selectedReadingDeviceName.add(readingDeviceKey)
-                            viewModel.updateAndFilterTemperatures(selectedReadingDeviceName, selectedDateRange.value)
-                        }
+                        viewModel.toggleReadingDevice(readingDeviceKey)
                     },
                     checked = readingDeviceKey in selectedReadingDeviceName,
                     colors = SegmentedButtonDefaults.colors(
@@ -194,9 +157,7 @@ fun FilterMenu(
                     ),
                 ) {
                     Text(
-                        text = if (readingDeviceByName.containsKey(readingDeviceKey))
-                            readingDeviceByName[readingDeviceKey]!!
-                        else "Le label : $readingDeviceKey n'existe pas"
+                        text = readingDeviceKey.value
                     )
                 }
             }
@@ -204,10 +165,6 @@ fun FilterMenu(
         ButtonWithIconAndText(
             onClickButton = {
                 viewModel.resetFilters()
-                selectedDateRange.value = null to null
-
-                selectedReadingDeviceName.clear()
-                selectedReadingDeviceName.addAll(readingDevices)
             },
             text = "Réinitialiser les filtres",
             icon = Icons.Filled.Restore,

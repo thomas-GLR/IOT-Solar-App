@@ -1,7 +1,7 @@
 package com.example.solariotmobile.data
 
 enum class ReadingDeviceName(val value: String) {
-    TOP("Haut"),
+    BOTTOM("Bas"),
     MIDDLE("Milieu"),
-    BOTTOM("Bas")
+    TOP("Haut")
 }
