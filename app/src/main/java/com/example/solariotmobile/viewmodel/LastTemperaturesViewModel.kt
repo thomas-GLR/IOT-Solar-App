@@ -42,8 +42,10 @@ class LastTemperaturesViewModel @Inject constructor(private val temperaturesRepo
                 _loadingLastTemperatures.value = false
 
                 if (response.isSuccessful) {
-                    _lastTemperatures.value =
+                    val lastTemperaturesFromBody =
                         if (response.body() == null) emptyList() else response.body()!!
+
+                    _lastTemperatures.value = lastTemperaturesFromBody.sortedBy { it.readingDeviceName }
                 } else {
                     _messageLastTemperatures.value = ErrorResponseFactory.createErrorMessage(response.code(), response.errorBody())
                 }
