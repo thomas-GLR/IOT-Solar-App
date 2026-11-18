@@ -69,7 +69,7 @@ fun TemperaturesEvolution(
     fetchData: (aggregationType: AggregationType, firstDate: LocalDateTime, endDate: LocalDateTime) -> Unit
 ) {
     var selectedDevice by remember { mutableStateOf(ReadingDeviceName.TOP) }
-    var selectedTimeRange by remember { mutableStateOf(AggregationType.MONTHS) }
+    var selectedTimeRange by remember { mutableStateOf(AggregationType.DAYS) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var firstDate by remember { mutableStateOf<LocalDateTime?>(null) }
     var endDate by remember { mutableStateOf<LocalDateTime?>(null) }
