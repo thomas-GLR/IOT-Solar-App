@@ -25,7 +25,7 @@ fun TimeRangeButton(
 //        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        var selectedIndex by remember { mutableIntStateOf(2) }
+        var selectedIndex by remember { mutableIntStateOf(0) }
         val options = listOf(
 //            AggregationType.HOURS,
             AggregationType.DAYS,
