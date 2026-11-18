@@ -39,12 +39,10 @@ class GridDetailViewModel @Inject constructor(private val temperaturesRepository
 
         viewModelScope.launch {
             try {
-                // AggregationType.MONTHS groupe les températures par jours
                 val response = temperaturesRepository.getDetailTemperatures(
-                    // Je dois enlever 2 heures à cause de nestJs qui ne sait pas gérer les dates correctement
-                    _selectedDate.value.atStartOfDay().minusHours(2),
-                    _selectedDate.value.plusDays(1).atStartOfDay().minusHours(2),
-                    _selectedReadingDeviceName.value
+                    date.atStartOfDay(),
+                    date.plusDays(1).atStartOfDay(),
+                    readingDeviceName
                 )
 
                 _loadingDetail.value = false
