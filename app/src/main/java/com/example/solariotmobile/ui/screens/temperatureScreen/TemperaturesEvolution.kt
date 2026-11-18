@@ -74,7 +74,14 @@ fun TemperaturesEvolution(
     var firstDate by remember { mutableStateOf<LocalDateTime?>(null) }
     var endDate by remember { mutableStateOf<LocalDateTime?>(null) }
     var dateFormatter by remember { mutableStateOf(DateTimeFormatter.ofPattern("dd")) }
-    var valueSelectedFromOption by remember { mutableIntStateOf(LocalDate.now().monthValue - 1) }
+    var selectedOptions by remember {
+        mutableStateOf(mapOf(
+            AggregationType.HOURS to LocalTime.now().hour,
+            AggregationType.MONTHS to (LocalDate.now().monthValue - 1),
+            AggregationType.YEARS to getYearsFrom(FIRST_YEAR).lastIndex
+        ))
+    }
+    val valueSelectedFromOption = selectedOptions[selectedTimeRange] ?: 0
 
     // Récupérer les données de température pour l'appareil sélectionné
     var selectedTemperatures by remember { mutableStateOf<List<ChartTemperature>>(emptyList()) }
@@ -111,24 +118,21 @@ fun TemperaturesEvolution(
         when (selectedTimeRange) {
             AggregationType.HOURS -> {
                 dateFormatter = DateTimeFormatter.ofPattern("HH:mm")
-                valueSelectedFromOption = LocalTime.now().hour
             }
 
             AggregationType.DAYS -> {
                 dateFormatter = DateTimeFormatter.ofPattern("HH:mm")
-                firstDate = LocalDate.now().atStartOfDay()
-                endDate = LocalDate.now().plusDays(1).atStartOfDay()
+                firstDate = selectedDate.atStartOfDay()
+                endDate = selectedDate.plusDays(1).atStartOfDay()
             }
 
             AggregationType.MONTHS -> {
                 dateFormatter = DateTimeFormatter.ofPattern("dd")
                 // valueSelectedFromOption est un index qui commence à 0 pour les mois.
-                valueSelectedFromOption = LocalDate.now().monthValue - 1
             }
 
             AggregationType.YEARS -> {
                 dateFormatter = DateTimeFormatter.ofPattern("MM")
-                valueSelectedFromOption = getYearsFrom(FIRST_YEAR).lastIndex
             }
         }
 
@@ -203,7 +207,7 @@ fun TemperaturesEvolution(
                     defaultValue = valueSelectedFromOption,
                     aggregationType = selectedTimeRange,
                     onSelectedOption = { value ->
-                        valueSelectedFromOption = value
+                        selectedOptions = selectedOptions + (selectedTimeRange to value)
 
                         val firstAndEndDate =
                             constructStartDateAndEndDate(selectedTimeRange, value, selectedDate)
@@ -336,12 +340,8 @@ fun ButtonForDialog(
 
     Log.i("ButtonForDialog", "Options : $options\ndefaultValue : $defaultValue")
 
-    var showDialogTimeSelector by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(options[defaultValue]) }
-
-    LaunchedEffect(defaultValue) {
-        selectedOption = options[defaultValue]
-    }
+    var showDialogTimeSelector by remember(aggregationType) { mutableStateOf(false) }
+    val selectedOption = options.getOrNull(defaultValue).orEmpty()
 
     Button(
         onClick = { showDialogTimeSelector = !showDialogTimeSelector },
@@ -388,7 +388,6 @@ fun ButtonForDialog(
             options = options,
             onConfirm = { selectedIndex ->
                 showDialogTimeSelector = false
-                selectedOption = options[selectedIndex]
                 onSelectedOption(selectedIndex)
             }
         )
